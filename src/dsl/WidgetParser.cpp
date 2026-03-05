@@ -546,10 +546,10 @@ private:
             expr.kind = ExprKind::Var;
             expr.value = ReadDottedIdentifier();
             if (Match(TokenType::Comma)) {
-                // Read fallback until ')'
+                // Read fallback until ')'.
+                // Concatenate without spaces so '#' + 'FF0000' becomes '#FF0000'.
                 std::string fb;
                 while (!Check(TokenType::CloseParen) && !Check(TokenType::EndOfFile)) {
-                    if (!fb.empty() && m_current.type != TokenType::Comma) fb += ' ';
                     fb += m_current.text;
                     Advance();
                 }
@@ -569,6 +569,16 @@ private:
             expr.kind = ExprKind::Literal;
             expr.value = m_current.text;
             Advance();
+        } else if (Check(TokenType::Error) && m_current.text == "#") {
+            // Hex color literal: '#' is tokenized as Error, followed by hex digits
+            // which may be split across multiple tokens (e.g. #0000FF -> '#' + '0000' NumberLiteral + 'FF' Identifier)
+            expr.kind = ExprKind::Literal;
+            expr.value = "#";
+            Advance();
+            while (Check(TokenType::Identifier) || Check(TokenType::NumberLiteral)) {
+                expr.value += m_current.text;
+                Advance();
+            }
         } else if (IsIdentOrKeyword(m_current.type)) {
             if (propertyNames.contains(m_current.text)) {
                 expr.kind = ExprKind::PropertyRef;

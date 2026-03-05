@@ -91,6 +91,7 @@ set(CORE_SOURCES
     src/input/RebindingStore.cpp
     src/input/ButtonPromptResolver.cpp
     src/widget/ViewportManager.cpp
+    src/dsl/DSLRuntimeEngine.cpp
     # Each task appends here
 )
 
@@ -131,6 +132,8 @@ set(CORE_HEADERS
     include/ohui/input/ButtonPromptResolver.h
     include/ohui/widget/IViewportWidget.h
     include/ohui/widget/ViewportManager.h
+    include/ohui/dsl/DrawCall.h
+    include/ohui/dsl/DSLRuntimeEngine.h
     # Each task appends here
 )
 

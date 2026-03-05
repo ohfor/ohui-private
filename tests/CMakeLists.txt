@@ -17,6 +17,7 @@ set(TEST_SOURCES
     ButtonPromptTests.cpp
     WidgetParserTests.cpp
     ViewportTests.cpp
+    DSLRuntimeTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
