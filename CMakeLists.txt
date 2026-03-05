@@ -37,9 +37,6 @@ endif()
 # spdlog and xbyak come from vcpkg
 find_package(spdlog CONFIG REQUIRED)
 
-# Uncomment if your plugin uses MinHook for function detouring
-# find_package(minhook CONFIG REQUIRED)
-
 # CommonLibSSE-NG via FetchContent (SE/AE/VR in single DLL)
 include(FetchContent)
 message(STATUS "Fetching CommonLibSSE-NG...")
@@ -56,51 +53,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(CommonLibSSE)
 
-# ---- Source files ----
-set(SOURCES
-    src/main.cpp
-)
-
-set(HEADERS
-    include/PCH.h
-    include/Version.h
-)
-
-# ---- Create DLL ----
-add_library(
-    ${PROJECT_NAME}
-    SHARED
-    ${SOURCES}
-    ${HEADERS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/version.rc
-)
-
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
-
-target_include_directories(
-    ${PROJECT_NAME}
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-    CommonLibSSE::CommonLibSSE
-    # minhook::minhook  # Uncomment if using MinHook
-)
-
-target_precompile_headers(
-    ${PROJECT_NAME}
-    PRIVATE
-    include/PCH.h
-)
-
-# ---- Compiler options ----
+# ---- Shared compile options ----
+add_library(ohui_compile_options INTERFACE)
 if(MSVC)
-    target_compile_options(
-        ${PROJECT_NAME}
-        PRIVATE
+    target_compile_options(ohui_compile_options INTERFACE
         /W4
         /WX-
         /permissive-
@@ -111,6 +67,72 @@ if(MSVC)
         /MP
     )
 endif()
+
+# ---- ohui_core: testable logic, no game engine ----
+set(CORE_SOURCES
+    src/core/Log.cpp
+    src/cosave/CosaveManager.cpp
+    src/cosave/PersistenceAPI.cpp
+    src/dsl/USSParser.cpp
+    src/dsl/TokenStore.cpp
+    src/layout/YogaWrapper.cpp
+    # Each task appends here
+)
+
+set(CORE_HEADERS
+    include/ohui/core/IFileSystem.h
+    include/ohui/core/Log.h
+    include/ohui/core/Result.h
+    include/ohui/core/Types.h
+    include/ohui/cosave/CosaveManager.h
+    include/ohui/cosave/PersistenceAPI.h
+    include/ohui/dsl/USSParser.h
+    include/ohui/dsl/TokenStore.h
+    include/ohui/layout/YogaWrapper.h
+    # Each task appends here
+)
+
+add_library(ohui_core STATIC ${CORE_SOURCES} ${CORE_HEADERS})
+
+target_include_directories(ohui_core PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_precompile_headers(ohui_core PRIVATE include/CorePCH.h)
+
+target_link_libraries(ohui_core
+    PUBLIC spdlog::spdlog
+    PRIVATE ohui_compile_options
+)
+
+target_compile_features(ohui_core PRIVATE cxx_std_23)
+
+# ---- OHUI DLL: ships to users ----
+set(DLL_SOURCES
+    src/main.cpp
+    src/core/GameBridge.cpp
+)
+
+set(DLL_HEADERS
+    include/PCH.h
+    include/Version.h
+)
+
+add_library(${PROJECT_NAME} SHARED
+    ${DLL_SOURCES}
+    ${DLL_HEADERS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.rc
+)
+
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE include/PCH.h)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ohui_core
+    CommonLibSSE::CommonLibSSE
+    ohui_compile_options
+)
 
 # ---- Post build ----
 # Set SKYRIM_MODS_PATH env var to auto-copy DLL to your mod manager's staging folder
