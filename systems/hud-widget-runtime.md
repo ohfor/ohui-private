@@ -258,6 +258,26 @@ the mods built on it.
 
 ---
 
+## First-Party HUD Widgets
+
+OHUI ships the following as core widgets on the canvas. Each is a
+standard widget — editable, skinnable, data-bound via the schema.
+
+- **Health bar** — player health with regen and damage flash
+- **Magicka bar** — player magicka with regen
+- **Stamina bar** — player stamina with regen and sprint drain
+- **Shout meter** — cooldown timer with word-count segmentation
+- **Compass** — heading, nearby markers, distance indicators
+- **Detection meter / stealth eye** — sneak detection state
+- **Enemy health bars / actor info bars** — nearby hostile actors with name, level, and health. Boss bar variant for named enemies.
+- **Active effects** — current magic effects with icon, duration, magnitude
+- **Quest tracker** — active objective display
+- **Notification toast** — transient messages from the message log stream
+- **Recent loot** — compact visual feed of items just picked up, with icon, name, and quantity. Auto-fades.
+- **QuickLoot** — container contents popup on crosshair target
+
+---
+
 ## Non-Scaleform Overlays
 
 Some HUD mods render outside Scaleform entirely — TrueHUD and Wheeler

@@ -48,11 +48,10 @@ Tab menu where they expect it, doing what they expect.
 - Map
 - Skills
 - Wait
-- MCM (new — see below)
 
-MCM is added as a default slot. The most commonly requested Tween Menu feature
-in the modding community, never previously realised because the vanilla Tween Menu
-is hardcoded. Under OHUI it is simply a destination like any other.
+The defaults match vanilla. Players can add any destination they want —
+including MCM — through the configuration system. OHUI does not impose
+opinionated defaults beyond what players already know.
 
 ---
 
@@ -103,18 +102,16 @@ static configuration.
 
 ---
 
-## MCM as First-Class Destination
+## MCM as Available Destination
 
-MCM2 is a top-level navigation destination, not a System menu appendage. Under
-OHUI, MCM conceptually belongs at the Tween Menu level — it is a screen players
-access regularly during normal gameplay, not an administrative function buried
-in a pause menu.
+MCM2 is available as a Tween Menu destination for players who want it.
+The vanilla Tween Menu could never be extended — MCM was always buried
+three levels deep. OHUI makes it assignable to a slot like any other
+screen.
 
-Tab → MCM. One step. From anywhere in the game.
-
-This has been requested repeatedly across the modding community and never realised
-because the vanilla Tween Menu cannot be extended. OHUI's architecture makes it
-trivial. It is a default slot because it belongs there.
+MCM is not a default slot. Players who want Tab → MCM add it
+themselves through the configuration system. One step from gameplay
+for players who choose it.
 
 ---
 
@@ -167,9 +164,9 @@ Skins implement whatever visual treatment they choose.
 The Tween Menu is not a wow feature. It is a quality of life correction that
 players feel immediately and positively.
 
-The MCM direct access is the specific moment — the first time a player reaches
-their mod configuration in one button press instead of three, they notice. It
-is a small friction that has existed for thirteen years and is now gone.
+The configurability is the specific moment — the first time a player adds
+MCM to the Tween Menu and reaches their mod configuration in one button
+press instead of three, they notice.
 
 The extensibility is the ecosystem moment — mod authors whose screens finally
 have a natural home in the navigation hierarchy rather than being buried or

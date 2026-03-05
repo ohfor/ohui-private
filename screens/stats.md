@@ -52,23 +52,7 @@ Dungeons cleared: 34     Ingredients eaten: 203  Pages read: 67
 The vanilla numbers are fixed and engine-owned. Everything else is whatever
 mods register. OHUI defines the display contract. Mods push data into it.
 
-**Stamp system integration:**
-Crafting stats derived from stamp history are richer than anything the
-engine natively tracks. "312 potions brewed" is a vanilla stat. "47
-potions brewed at Alchemy 80+" is stamp data. "Longest carried item:
-Valdris's Iron Sword (crafted Day 3, still held Day 187)" is stamp data.
-The stamp system and the extensible stats screen are natural complements
-— the stamp system generates data the stats screen can surface.
-
 **Sequencing:**
-This feature waits on two things being mature before it gets built:
-the stamp system in production, and the mod registration API pattern
-proven across sleep screen warnings, message log custom types, and
-custom skill trees. The stats registration API is the same concept
-applied to a new surface. It does not need to be designed from scratch
-— it needs to be built after those foundations are proven.
-
-Shipping 1.0 with a clean vanilla stats presentation and building the
-extensible version on top of a proven API is the correct sequencing.
-Rushing the registration system into 1.0 means building it against
-incomplete foundations.
+Shipping 1.0 with a clean vanilla stats presentation. The extensible
+version can be built post-1.0 once the core systems are proven and
+the mod integration model is established.

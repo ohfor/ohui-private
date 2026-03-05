@@ -221,7 +221,7 @@ The known integration seams are covered in their respective systems documents:
 - Input action registration → `systems/input-handling.md`
 - MCM compatibility shim → `systems/mcm2.md`
 - MCM2 declarative config → `systems/mcm2.md`
-- Mod registration API → `systems/mod-registration-api.md`
+- Mod integration model → `systems/mod-registration-api.md`
 - Cosave / persistence → `systems/cosave-persistence.md`
 
 ---
@@ -252,10 +252,11 @@ OHUI is independent infrastructure. Both projects benefit directly:
 - `systems/localisation.md` — string format, pluralisation, RTL, font system.
 - `systems/performance-model.md` — update modes, dirty flagging.
 - `systems/mcm2.md` — MCM compatibility layer and declarative native API.
-- `systems/mod-registration-api.md` — registration pattern used across all extension points.
+- `systems/icon-system.md` — item/spell/perk/status icon resolution and atlases.
+- `systems/mod-registration-api.md` — mod integration model (engine reads, frozen giants, widget registration).
 - `systems/cosave-persistence.md` — cosave format, persistence API, lifecycle.
-- `systems/provenance-stamps.md` — item crafting history and legacy system.
 - `systems/message-log.md` — unified message log system.
+- `systems/new-game-plus.md` — PARKED. New Game+ feature, isolated pending further design.
 
 **Screens:**
 - `screens/inventory-barter-container.md`

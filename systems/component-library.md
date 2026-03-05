@@ -68,7 +68,6 @@ color.xp                    — skill/xp progress fill
 color.stolen                — stolen item indicators
 color.quest                 — quest item indicators
 color.enchanted             — enchanted item indicators
-color.sentimental           — sentimental/protected item indicators
 color.museum.needed         — LOTD needed item indicators
 color.museum.donated        — LOTD already donated indicators
 ```
@@ -456,14 +455,6 @@ A small coloured circle. No text. Pure status signal.
 Usage: unread message log entries, new item indicator in container,
 active widget indicator in edit mode.
 
-**ProvenanceStamp**
-A formatted display of a single provenance stamp entry. Action type,
-character name, skill level, date, optional dedication. Collapsible
-history list of multiple stamps.
-
-Usage: item detail panel for player-crafted items, container screen
-follower inventory detail, gift staging panel.
-
 **AlertBanner**
 A full-width or partial-width banner communicating a warning or
 information state. Icon, message, optional action link. Dismissable.
@@ -588,8 +579,8 @@ Input components:      7  (TextInput, SearchField, Toggle, Slider,
                            Dropdown, Stepper, ContextMenu)
 Container components:  5  (Panel, SplitPanel, ScrollPanel, Modal, Tooltip,
                            Drawer)
-Indicator components:  5  (StatusBadge, IndicatorDot, ProvenanceStamp,
-                           AlertBanner, CompletionRing)
+Indicator components:  4  (StatusBadge, IndicatorDot, AlertBanner,
+                           CompletionRing)
 Media components:      4  (Portrait, CharacterViewport, SceneViewport,
                            MapViewport)
 HUD components:        7  (ResourceBar, ShoutMeter, CompassRose,
@@ -597,7 +588,7 @@ HUD components:        7  (ResourceBar, ShoutMeter, CompassRose,
 Edit mode components:  4  (WidgetBoundingBox, AlignmentGuide,
                            EditModeToolbar, GridOverlay)
 ────────────────────────────────────────────────────────────────
-Total components:     59  (excluding atoms and tokens)
+Total components:     58  (excluding atoms and tokens)
 ```
 
 ---

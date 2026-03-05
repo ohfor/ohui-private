@@ -288,32 +288,12 @@ are all present in the save file and readable without loading the
 save into the game world. OHUI reads these fields directly.
 
 **The OHUI cosave** — playtime, last session timestamp, and any
-OHUI-specific data (provenance stats, outfit names, etc.) for display
-on the character card.
+OHUI-specific data (outfit names, etc.) for display on the character
+card.
 
 Neither source requires loading the save into the game world. The
 load game screen renders entirely from file reads. Character selection
 is instant. Save browsing is instant. The game world loads only when
 the player confirms a save to load.
 
----
 
-## Relationship to New Game+
-
-The character gallery includes a subtle indicator on characters that
-are eligible New Game+ sources — characters with completed main quest
-or significant achievement thresholds. Tapping a card's context menu
-offers "Start New Game+ from this character" as an alternative to
-loading a save.
-
-Selecting New Game+ from the character card pre-populates the New
-Game+ configuration screen with this character's legacy data and
-navigates there directly. The player does not need to return to the
-main menu.
-
-Detached cosaves — cosaves whose paired save files have been deleted
-— appear in a separate section at the bottom of the character gallery,
-visually distinct, labelled "Legacy Characters." They cannot be loaded
-(no save file) but can be selected as New Game+ sources. A player who
-deliberately deleted their saves after completing a playthrough can
-still carry that character's legacy forward.

@@ -115,17 +115,6 @@ This is the menu-like structure below the constellation. The constellation handl
 spatial navigation of the tree. The description panel handles deep navigation of
 the selected perk's information. Both are active simultaneously.
 
-### Perk Path Planning
-
-A planning mode — toggled, not default — allows the player to mark a target perk
-and see the full prerequisite path highlighted in the constellation. "I want
-Shadowstrike. What do I need first?" The constellation lights up the path. The
-description panel shows the total perk point cost and skill level requirements
-to reach the target.
-
-Planning mode does not commit any perk points. It is a read-only planning surface.
-The player plans their build, closes planning mode, and takes perks normally.
-
 ---
 
 ## Custom Skill Trees
@@ -234,12 +223,7 @@ constellation treatment is something those mod communities will notice and share
    refunding is enabled by the active framework — not a default feature, not OHUI's
    decision to make, but the UI should support it when the system allows it.
 
-2. **Build saving:** The planning mode raises the question of saved builds. Can
-   the player save a planned perk path and return to it later? Potentially very
-   useful for people running multiple characters or planning ahead. Scope question
-   — probably not launch but worth noting.
-
-3. **Generated layout quality:** The automatic constellation layout algorithm needs
+2. **Generated layout quality:** The automatic constellation layout algorithm needs
    real perk tree data to validate against. LOTD and Thieves Guild trees are the
    obvious test cases. The algorithm should be validated against these before launch.
 

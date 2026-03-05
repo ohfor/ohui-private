@@ -3,10 +3,10 @@
 ## Purpose
 
 OHUI persists a significant amount of data across sessions — layout
-profiles, widget positions and sizes, outfit definitions, provenance
-stamps, MCM control values, message log history, favourites radial
-configuration, MCM list ordering, hide and rename overrides, New Game+
-legacy data, and any data registered by mods via the persistence API.
+profiles, widget positions and sizes, outfit definitions, MCM control
+values, message log history, favourites radial configuration, MCM list
+ordering, hide and rename overrides, and any data registered by mods
+via the persistence API.
 
 None of this belongs in the Skyrim save file. The save file is the
 game's domain. OHUI writes a cosave — a companion file alongside the
@@ -125,14 +125,6 @@ stored — the binding map is a delta, not a full copy.
 Orphaned entries (mod uninstalled) are retained and pruned after N
 sessions, matching the MCM orphan pattern.
 
-### New Game+ Legacy
-
-The legacy data package assembled when the player initiates a New
-Game+. Present only in cosaves that are the source of a New Game+
-or that have inherited legacy data. Contains selected carry-forward
-categories, their associated data, and the generated legacy summary
-text.
-
 ### Mod Data
 
 An extensible key-value store for mod-registered persistence data.
@@ -146,9 +138,8 @@ exceed limits are rejected and logged.
 ## Standalone Read (No Active Session)
 
 Some features need to read cosave data outside of an active game
-session — the load game screen reads character portraits and metadata,
-and the New Game+ configuration screen reads legacy data from a
-source save the player selects.
+session — the load game screen reads character portraits and metadata
+from cosave files at the main menu.
 
 OHUI provides a read-only access path for this purpose. It opens a
 cosave file by path, validates it, and reads specific blocks. This
@@ -231,8 +222,7 @@ and mods may then read their data.
 
 OHUI generates a new character identity, creates an empty cosave in
 memory, applies built-in defaults (layout profiles, widget states),
-and signals readiness. If a New Game+ package is present, legacy data
-is applied before the readiness signal.
+and signals readiness.
 
 ### On Save
 
@@ -242,9 +232,8 @@ atomically. Atomic write prevents corruption from interrupted saves.
 ### On Character Delete
 
 When a save is deleted from the load game screen, OHUI offers to
-delete the associated cosave. The player can decline — they may want
-to keep it for New Game+ purposes. Declined cosaves are retained and
-visible as detached cosaves, available as New Game+ sources.
+delete the associated cosave. The player can decline. Declined cosaves
+are retained as detached cosaves visible in the load game screen.
 
 ---
 

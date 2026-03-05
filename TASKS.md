@@ -777,8 +777,8 @@ slides in/out with animation.
 
 ### TASK-050F · Indicator and Media Components
 
-**What:** StatusBadge, IndicatorDot, ProvenanceStamp, AlertBanner,
-CompletionRing, Portrait, CharacterViewport, SceneViewport, MapViewport.
+**What:** StatusBadge, IndicatorDot, AlertBanner, CompletionRing,
+Portrait, CharacterViewport, SceneViewport, MapViewport.
 
 **Start state:** TASK-050A complete. TASK-028 (viewport contract) for
 media viewport components.
@@ -788,7 +788,6 @@ Media viewport components render into viewport contract surfaces.
 CharacterViewport supports rotate/zoom/pan input.
 
 **Definition of done:**
-- ProvenanceStamp renders complete stamp history collapsible
 - AlertBanner renders dismissable warning with icon
 - CharacterViewport renders player character with camera control
 - Portrait renders NPC bust with fixed framing
@@ -861,7 +860,6 @@ item detail panel, sort controls, all item categories, and all
 item action verbs (equip, drop, favourite, inspect).
 **Definition of done:** Player can open inventory, filter by type and
 condition, select and equip an item, drop an item, mark favourite.
-Provenance stamp visible in detail panel for stamped items.
 
 **Reference:** `screens/inventory-barter-container.md`
 
@@ -871,10 +869,9 @@ Provenance stamp visible in detail panel for stamped items.
 
 **Start state:** TASK-050C complete.
 **End state:** Player inventory and merchant inventory side by side.
-Offer panel. Gold/value display. Transaction confirm. Sentimental
-item protection fires on attempt to add sentimental item to offer.
-**Definition of done:** Complete a buy, complete a sell, attempt to
-sell sentimental item and receive confirmation prompt.
+Offer panel. Gold/value display. Transaction confirm.
+**Definition of done:** Complete a buy, complete a sell, confirm
+transaction completes correctly with gold updated.
 
 **Reference:** `screens/inventory-barter-container.md`
 
@@ -884,10 +881,9 @@ sell sentimental item and receive confirmation prompt.
 
 **Start state:** TASK-050C complete.
 **End state:** Player inventory and container inventory side by side.
-Take All (skips sentimental). Transfer individual items. Search
-across both lists.
-**Definition of done:** Take All skips sentimental items. Individual
-transfer works both directions.
+Take All. Transfer individual items. Search across both lists.
+**Definition of done:** Take All works. Individual transfer works
+both directions.
 
 **Reference:** `screens/inventory-barter-container.md`
 
@@ -909,13 +905,18 @@ filter by school.
 ### TASK-055 · Crafting Screens
 
 **Start state:** TASK-050C complete.
-**End state:** Smithing forge (craft), smithing workbench (temper),
-alchemy lab, and enchanting table. All functional. Provenance stamp
-written on confirmed craft action. Dedication field presented after
-confirmation.
-**Definition of done:** Craft an item, receive stamp with correct
-skill level and date. Dedication entered and stored. Stamp visible
-in inventory detail panel.
+**End state:** Smithing forge (craft and temper), alchemy lab,
+enchanting table, and cooking pot. All functional. Shared QOL:
+search, filter (can-craft-now default on), sort. Active effect
+timer strip visible when fortify effects are active. Smithing
+output/temper preview engine-sourced. Alchemy effect matching
+on known effects only. Enchanting strength preview with soul gem
+comparison. Enchanting item naming field. Bulk enchanting flow.
+Cooking survival context when survival mode active.
+**Definition of done:** Craft a smithing item with output preview.
+Temper with quality tier roadmap. Brew a potion with effect matching.
+Enchant with strength preview and naming field. Active effect timer
+visible and draining during fortify buff.
 
 **Reference:** `screens/crafting.md`
 
@@ -954,10 +955,13 @@ after save/reload.
 **Start state:** Phase 6, Phase 2 complete. Investigation into
 constellation rendering approach complete.
 **End state:** All 18 skill trees functional. Perk acquisition
-functional. Level up perk points correctly tracked. Perk description
-panel with structured info (name, rank, effect, requirements).
+functional. Perk points correctly tracked. Perk description panel
+with structured info (name, rank, effect per rank, requirements,
+conditional effects, synergies, source). Navigation between
+prerequisites and dependents. Skill XP bar with exact XP-to-next.
 **Definition of done:** Spend a perk point, confirm tree updates.
-Perk description shows all ranks and requirements.
+Perk description shows all ranks and requirements. Navigate from
+a perk to its prerequisite and back.
 
 **Reference:** `screens/skills.md`
 
@@ -994,9 +998,12 @@ values for the selected attribute.
 
 **Start state:** Phase 6, Phase 2 complete.
 **End state:** Main menu with Continue, New Game, Load Game, Settings,
-Credits, Quit. Settings entry point functional.
+Credits, Quit to Desktop. Styled consistently with active OHUI skin.
+Settings entry point functional (OHUI config, display, audio,
+controls, gameplay).
 **Definition of done:** All menu options functional. New Game starts
-a new game. Continue loads most recent save. Settings opens.
+a new game. Continue loads most recent save. Settings opens. Quit
+exits directly without confirmation.
 
 **Reference:** `screens/main-menu.md`
 
@@ -1065,10 +1072,13 @@ displays appropriate level for current location.
 ### TASK-066 · Loading Screen
 
 **Start state:** Phase 6, Phase 2 complete.
-**End state:** Loading screen with tip display, item card for
-featured items, progress indicator.
+**End state:** Vanilla loading screen running faithfully — rotating
+model, loading bar, tip text. Bar and tip styled consistently with
+active OHUI skin. Custom loading screen mods (NIF/texture/tip
+replacements) remain compatible.
 **Definition of done:** Loading screen appears during cell transition
-with tip and progress bar.
+with skinned bar and tip text. A custom loading screen mod's assets
+display correctly.
 
 **Reference:** `screens/loading-screen.md`
 
@@ -1088,13 +1098,13 @@ correctly populated.
 ### TASK-068 · Tween Menu
 
 **Start state:** Phase 6, Phase 2 complete.
-**End state:** Configurable radial quick-nav widget. Default 6 slots
-(Inventory, Magic, Map, Skills, Wait, MCM). Inline configuration via
-edit mode — reassign destinations from live registry, add/remove
-slots. Slot configuration persisted in cosave.
+**End state:** Configurable radial quick-nav widget. Default 5 slots
+matching vanilla (Inventory, Magic, Map, Skills, Wait). Inline
+configuration via edit mode — reassign destinations from live
+registry, add/remove slots. Slot configuration persisted in cosave.
 **Definition of done:** Open tween menu, navigate to each default
-destination. Enter edit mode, reassign a slot to a different
-destination, confirm it persists after reload.
+destination. Enter edit mode, add MCM as a new slot, reassign a
+slot to a different destination, confirm it persists after reload.
 
 **Reference:** `screens/tween-menu.md`
 
@@ -1201,120 +1211,66 @@ Panel-level copy. Quest-attributed entries link to journal.
 
 ---
 
-## Phase 9 — Mod Registration API
+## Phase 9 — Mod Integration
 
-Requires Phase 6 (component library) for UI surfaces.
-Can begin implementation of the pattern infrastructure alongside
-Phase 6.
+Requires Phase 1 (TASK-010 widget registry, TASK-012 data binding
+engine) complete. Independent of screen tasks.
 
 ---
 
-### TASK-085 · Registration Pattern Infrastructure
+### TASK-085 · Custom Widget Registration
 
-**What:** The shared registration infrastructure — manifest
-validation, window management, logging, versioned contract support.
+**What:** The widget registration API — the only integration point
+where mods must actively communicate with OHUI.
 
-**Start state:** Phase 0 complete.
+**Start state:** TASK-010, TASK-012 complete.
 
-**End state:** A registration framework that all extension points
-use. Manifest validation (mod ID, display name, version, API version).
-Registration window enforcement (post-load for non-MCM, re-open on
-save load for MCM). Validation failures logged consistently. Soft
-dependency guarantee — empty state for every registration point is
-defined and functional.
+**End state:** A mod can register a custom HUD widget by providing
+a manifest (ID, display name, default position/size, min/max
+constraints, default visibility) and a rendering implementation.
+Registered widgets participate fully in the canvas — edit mode,
+layout profiles, skin support. Manifest validation (mod ID required).
+Registration window enforcement (post-load). Duplicate ID supersedes.
+Graceful degradation when no widgets registered.
 
 **Definition of done:**
-- Registration during valid window accepted
-- Registration outside window rejected with warning log
-- Missing mod ID rejected
-- Duplicate mod ID at same point: second supersedes first
-- API version higher than supported: rejected with clear message
+- A test mod registers a widget — appears on canvas
+- Widget participates in edit mode (drag, resize)
+- Layout profile saves and restores widget position
+- Missing mod ID rejected with warning log
+- Registration outside valid window rejected with warning log
 
-**Reference:** `systems/mod-registration-api.md`
+**Reference:** `systems/mod-registration-api.md` § Custom Widgets
 
 ---
 
-### TASK-086 · Screen-Specific Registration Points
+### TASK-086 · Custom Data Binding Registration
 
-**What:** Implement each individual registration point at the screens
-that consume them.
+**What:** The custom binding registration API — mods expose game
+state values OHUI doesn't know about.
 
-**Start state:** TASK-085 complete. Relevant screen tasks complete.
+**Start state:** TASK-012 (data binding engine) complete.
 
-**End state:** All registration points functional:
-- Sleep screen: survival mod registration
-- Message log: custom type registration
-- Magic screen: custom spell school registration
-- Loading screen: scene registration
-- Stats screen: custom stat registration
-- FacetedList: custom facet registration
-- Favourites radial: custom slot type registration
-- HUD: widget registration (mod-authored widgets)
+**End state:** A mod can register a custom data binding with a
+key (e.g. `mymod.player.hunger`), a type, and a poll source.
+Any widget can then bind to it. Frozen giant integrations use
+this mechanism — OHUI registers bindings on the mod's behalf.
+Graceful empty state when no custom bindings registered.
 
 **Definition of done:**
-- A test mod registers a survival need — appears in sleep screen panel
-- A test mod registers a custom message type — appears as tab in log
-- A test mod registers a custom facet — appears in FacetPanel
-- A test mod registers a HUD widget — appears on canvas in edit mode
-- All registration points return graceful empty state when nothing registered
+- A test mod registers a Float binding — a test widget reads it
+- Binding updates propagate to subscribed widgets
+- Duplicate key supersedes with warning log
+- No custom bindings registered: all built-in bindings unaffected
 
-**Reference:** `systems/mod-registration-api.md` § Registration Points
-
----
-
-## Phase 10 — Provenance Stamps
-
-Requires TASK-055 (crafting screens) and TASK-004 (cosave).
+**Reference:** `systems/mod-registration-api.md` § Custom Data Bindings
 
 ---
 
-### TASK-070 · Stamp Write
-
-**What:** Write provenance stamps at craft, temper, enchant, brew,
-and cook trigger points.
-
-**Start state:** TASK-055 complete. TASK-004 complete.
-
-**End state:** A stamp manager writes a stamp to the cosave Stamped
-Items block at each crafting trigger. Stamp contains all fields
-defined in the schema. Item instance IDs generated at first stamp.
-Sentimental flag settable via the API.
-
-**Definition of done:**
-- Craft item — stamp present in cosave with correct skill level,
-  date, character name
-- Temper item — second stamp added to history
-- Sentimental flag set — item protected from bulk operations
-
-**Reference:** `systems/provenance-stamps.md`
-
----
-
-### TASK-071 · Stamp Read and API
-
-**What:** The read API surface — internal OHUI reads and the
-external mod-facing Papyrus/C++ API.
-
-**Start state:** TASK-070 complete.
-
-**End state:** Stamp read API functional from both native code and
-Papyrus — query history, crafted status, sentimental status, and
-dedication. Inventory detail panel reads stamp history and renders
-it in the collapsible section.
-
-**Definition of done:**
-- Crafted item — detail panel shows stamp history
-- Stamp API correctly identifies crafted vs looted items
-- External mod reads dedication via API correctly
-
-**Reference:** `systems/provenance-stamps.md`
-
----
-
-## Phase 11 — Localisation
+## Phase 10 — Localisation
 
 Can begin as soon as Phase 0 is complete. Independent of all other
-phases, but blocks release of any user-visible text.
+phases but blocks release of any user-visible text.
 
 ---
 
@@ -1362,7 +1318,7 @@ Latin-only font falls back to Noto for Cyrillic.
 
 ---
 
-## Phase 12 — Compatibility Layers
+## Phase 11 — Compatibility Layers
 
 Requires Phase 6 (component library) for UI rendering.
 
@@ -1412,7 +1368,7 @@ to calling mod where determinable. Always on — not disableable.
 
 ---
 
-## Phase 13 — Frozen Giant Integrations
+## Phase 12 — Frozen Giant Integrations
 
 Requires relevant screen tasks complete. Each integration is
 independent and can be built in parallel.
@@ -1498,7 +1454,7 @@ and General Stores (barter/economy data).
 
 ---
 
-## Phase 14 — First-Party HUD Widgets
+## Phase 13 — First-Party HUD Widgets
 
 Requires Phase 3 (DSL runtime) and TASK-014 (data binding schema)
 complete. Each widget is independent.
@@ -1670,99 +1626,43 @@ list. Player can take items directly. Dismisses on look-away.
 
 ---
 
-## Phase 15 — New Game+ Flow
-
-Requires TASK-061 (main menu), TASK-004 (cosave), and TASK-070
-(stamp system) complete.
-
----
-
-### TASK-110 · New Game+ Configuration Screen
-
-**What:** The New Game+ configuration screen accessible from the
-main menu New Game flow.
-
-**Start state:** TASK-061, TASK-004, TASK-070 complete.
-
-**End state:** Player can choose New Game+ from the New Game prompt.
-Configuration screen presents carry-forward categories (perk points,
-known spells, crafting recipes, shout words, map memory, books read,
-faction standing, heirloom items). Each category toggleable. Heirloom
-item selection from source save inventory. Legacy summary generated
-and presented before confirmation.
-
-**Definition of done:**
-- New Game+ option available from main menu
-- All carry-forward categories toggleable
-- Heirloom items selectable (up to configurable max)
-- Legacy summary displays character accomplishments
-- Confirmation creates new save with selected carry-forward data
-
-**Reference:** `screens/main-menu.md` § New Game+
-
----
-
-### TASK-111 · New Game+ Companion Plugin
-
-**What:** The gameplay-side companion plugin that executes the
-mutations selected in the configuration screen.
-
-**Start state:** TASK-110 complete.
-
-**End state:** On new game start with New Game+ active, the companion
-plugin applies selected carry-forward data: perk point pool, known
-spells, crafting recipes, shout words, map markers, book read flags,
-faction standing values, heirloom items placed in starting chest.
-
-**Definition of done:**
-- Perk points available as pool (no perks pre-selected)
-- Known spells in spell list (tomes still exist in world)
-- Heirloom items in starting location chest with stamps intact
-- Map markers visible but locations uncleared
-
-**Reference:** `screens/main-menu.md` § New Game+
-
----
-
 ## Dependency Graph (summary)
 
 ```
 Phase 0 (TASK-001–005)
   ├── Phase 1 (TASK-010–014)  ← widget runtime + data binding schema
-  │     └── Phase 2 (TASK-020–022)  ← input
-  │           └── Phase 6 (TASK-050A–050H)  ← component library
-  │                 └── Phase 7 (TASK-051–069B)  ← screens
-  │                       ├── Phase 10 (TASK-070–071)  ← stamps
-  │                       ├── Phase 13 (TASK-095–098)  ← frozen giants
-  │                       └── Phase 15 (TASK-110–111)  ← new game+
+  │     ├── Phase 2 (TASK-020–022)  ← input
+  │     │     └── Phase 6 (TASK-050A–050H)  ← component library
+  │     │           └── Phase 7 (TASK-051–069B)  ← screens
+  │     │                 └── Phase 12 (TASK-095–098)  ← frozen giants
+  │     │
+  │     └── Phase 9 (TASK-085–086)  ← mod integration (widget + binding registration)
   │
   ├── Phase 3 (TASK-025–028)  ← DSL runtime
   │     ├── Phase 6 (merges here — components need DSL)
   │     ├── Phase 8 (TASK-075–077)  ← message log
-  │     └── Phase 14 (TASK-100–108)  ← first-party HUD widgets
+  │     └── Phase 13 (TASK-100–108)  ← first-party HUD widgets
   │
   ├── Phase 4 (TASK-030–033)  ← MCM compat
   │     └── Phase 5 (TASK-040–043)  ← MCM2 native
   │
-  ├── Phase 9 (TASK-085–086)  ← mod registration API
+  ├── Phase 10 (TASK-080–082)  ← localisation (parallel to all)
   │
-  ├── Phase 11 (TASK-080–082)  ← localisation (parallel to all)
-  │
-  └── Phase 12 (TASK-090–091)  ← compatibility layers
+  └── Phase 11 (TASK-090–091)  ← compatibility layers
 ```
 
 **Key dependency notes:**
 - Phase 3 (DSL runtime) is the architectural spine. Phase 6
-  (components) requires it. Phase 14 (HUD widgets) requires it.
+  (components) requires it. Phase 13 (HUD widgets) requires it.
   This is the critical path.
 - Phase 4 (MCM compat) is fully independent of Phases 1–3.
   Can be built in parallel by separate sessions.
-- Phase 11 (localisation) is independent of everything and can
+- Phase 9 (mod integration) depends only on Phase 1 (widget
+  registry + data binding engine). Independent of screens.
+- Phase 10 (localisation) is independent of everything and can
   run alongside any phase.
-- Phase 9 (mod registration) can begin pattern infrastructure
-  during Phase 6, but screen-specific points need their screens.
-- Phase 13 (frozen giants) and Phase 15 (New Game+) are late-stage
-  and depend on multiple screens being complete.
+- Phase 12 (frozen giants) is late-stage and depends on multiple
+  screens being complete.
 
 ---
 
@@ -1814,16 +1714,24 @@ design, or depend on prior phases being proven.
 - **DSL tooling** — syntax highlighting, error reporting, validation
   toolchain for mod authors. Important for adoption, not a launch
   blocker.
-- **Stats screen extensibility** — mod registration API for custom
-  tracked values. Post-1.0, depends on stamp system and registration
-  pattern maturity.
-- **New Game+ LOTD integration** — museum knowledge carry-forward.
-  Depends on LOTD integration (TASK-097) and New Game+ (TASK-110).
+- **Stats screen extensibility** — mod-contributed tracked values
+  via registration API. Post-1.0, depends on mod integration model
+  maturity.
 - **Live character render on load game** — post-1.0 exploratory.
-- **3D loading screen scenes** — Tier 3 from loading-screen.md.
-  Post-1.0 exploratory.
 - **Map live location preview** — post-1.0 exploratory.
 - **Share to web** — message log panel share button. Post-1.0,
   requires web service infrastructure.
-- **Outfit system** — referenced by inventory, container, favourites
-  radial, and New Game+. Needs its own design document before tasking.
+- **Outfit system** — referenced by inventory, container, and
+  favourites radial. Needs its own design document before tasking.
+- **New Game+** — parked in `systems/new-game-plus.md`. Not in 1.0
+  scope. Depends on further design discussion (heirloom items,
+  faction standing feasibility, companion plugin scope).
+
+## Cut Features
+
+The following were previously in scope and have been removed from
+the design entirely:
+
+- **Provenance stamps** — item crafting history, dedications,
+  sentimental protection. Cut. See `systems/provenance-stamps.md`
+  for status note.

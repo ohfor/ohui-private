@@ -30,11 +30,6 @@ relationship relevance. A player gifting Lydia a weapon she can use
 sees that highlighted. A player gifting Camilla Valerius a book sees
 that highlighted.
 
-**Provenance stamp visibility** — dedicated items show their dedication
-in the gift staging area. "Crafted by Valdris for Lydia" is visible
-before the gift is given. The moment of giving a dedicated item is
-confirmed before it is committed.
-
 ## What Is Not Here
 
 No transaction footer. No gold balance. No confirm/cancel trade flow.
