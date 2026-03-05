@@ -94,6 +94,7 @@ set(CORE_SOURCES
     src/dsl/DSLRuntimeEngine.cpp
     src/mcm/MCMRegistrationEngine.cpp
     src/mcm/MCMCallbackEngine.cpp
+    src/mcm/MCMListManager.cpp
     # Each task appends here
 )
 
@@ -139,6 +140,7 @@ set(CORE_HEADERS
     include/ohui/mcm/MCMTypes.h
     include/ohui/mcm/MCMRegistrationEngine.h
     include/ohui/mcm/MCMCallbackEngine.h
+    include/ohui/mcm/MCMListManager.h
     # Each task appends here
 )
 

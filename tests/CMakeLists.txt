@@ -20,6 +20,7 @@ set(TEST_SOURCES
     DSLRuntimeTests.cpp
     MCMRegistrationTests.cpp
     MCMCallbackTests.cpp
+    MCMListManagerTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
