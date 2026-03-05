@@ -93,6 +93,7 @@ set(CORE_SOURCES
     src/widget/ViewportManager.cpp
     src/dsl/DSLRuntimeEngine.cpp
     src/mcm/MCMRegistrationEngine.cpp
+    src/mcm/MCMCallbackEngine.cpp
     # Each task appends here
 )
 
@@ -137,6 +138,7 @@ set(CORE_HEADERS
     include/ohui/dsl/DSLRuntimeEngine.h
     include/ohui/mcm/MCMTypes.h
     include/ohui/mcm/MCMRegistrationEngine.h
+    include/ohui/mcm/MCMCallbackEngine.h
     # Each task appends here
 )
 

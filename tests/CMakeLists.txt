@@ -19,6 +19,7 @@ set(TEST_SOURCES
     ViewportTests.cpp
     DSLRuntimeTests.cpp
     MCMRegistrationTests.cpp
+    MCMCallbackTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
