@@ -76,6 +76,7 @@ set(CORE_SOURCES
     src/cosave/PersistenceAPI.cpp
     src/dsl/USSParser.cpp
     src/dsl/TokenStore.cpp
+    src/dsl/WidgetParser.cpp
     src/layout/YogaWrapper.cpp
     src/widget/WidgetRegistry.cpp
     src/binding/DataBindingEngine.cpp
@@ -105,6 +106,8 @@ set(CORE_HEADERS
     include/ohui/dsl/USSRule.h
     include/ohui/dsl/USSParser.h
     include/ohui/dsl/TokenStore.h
+    include/ohui/dsl/WidgetAST.h
+    include/ohui/dsl/WidgetParser.h
     include/ohui/layout/YogaWrapper.h
     include/ohui/widget/WidgetTypes.h
     include/ohui/widget/WidgetRegistry.h

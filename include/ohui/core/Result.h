@@ -23,6 +23,8 @@ enum class ErrorCode {
     ContextNotFound,
     ActionNotFound,
     BindingConflict,
+    VersionMismatch,
+    TypeError,
 };
 
 struct Error {
