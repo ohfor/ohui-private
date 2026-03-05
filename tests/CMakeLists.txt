@@ -5,6 +5,7 @@ set(TEST_SOURCES
     LayoutTests.cpp
     CosaveTests.cpp
     USSParserTests.cpp
+    PersistenceTests.cpp
     # Each task appends here
 )
 

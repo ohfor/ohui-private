@@ -13,6 +13,7 @@ enum class ErrorCode {
     DuplicateRegistration,
     ChecksumMismatch,
     IOError,
+    NotRegistered,
 };
 
 struct Error {
