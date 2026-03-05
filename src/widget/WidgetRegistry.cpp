@@ -23,6 +23,16 @@ Result<void> WidgetRegistry::Register(const WidgetManifest& manifest) {
     return {};
 }
 
+Result<void> WidgetRegistry::Unregister(std::string_view id) {
+    auto it = m_widgets.find(std::string(id));
+    if (it == m_widgets.end()) {
+        return std::unexpected(Error{ErrorCode::WidgetNotFound,
+            "Widget not found: " + std::string(id)});
+    }
+    m_widgets.erase(it);
+    return {};
+}
+
 Result<void> WidgetRegistry::Activate(std::string_view id) {
     auto it = m_widgets.find(std::string(id));
     if (it == m_widgets.end()) {

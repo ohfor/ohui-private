@@ -29,6 +29,8 @@ enum class ErrorCode {
     PageNotFound,
     InvalidState,
     CircularReference,
+    RegistrationWindowClosed,
+    InvalidModId,
 };
 
 struct Error {

@@ -13,6 +13,7 @@ namespace ohui::widget {
 class WidgetRegistry {
 public:
     Result<void> Register(const WidgetManifest& manifest);
+    Result<void> Unregister(std::string_view id);
     Result<void> Activate(std::string_view id);
     Result<void> Deactivate(std::string_view id);
     Result<void> Move(std::string_view id, Vec2 position);
