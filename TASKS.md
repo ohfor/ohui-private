@@ -1141,8 +1141,8 @@ slot to a different destination, confirm it persists after reload.
 
 **Start state:** Phase 6, Phase 2 complete.
 **End state:** Favourites radial with slot types: weapon, spell,
-shout, potion (smart selection), outfit, item. Outfit integration
-if outfit system available. Equip from radial. Cycle groups.
+shout, potion (smart selection), item. Equip from radial. Cycle
+groups. Outfit slot type deferred to TASK-115 (outfit integration).
 **Definition of done:** Assign a weapon, spell, and potion to radial
 slots. Equip each from the radial. Potion smart selection picks
 optimal potion from available stock.
@@ -1219,7 +1219,7 @@ and subtitle display.
 ### TASK-077 · Message Log Panel
 
 **What:** The full persistent log panel — tabbed, searchable,
-scrollable.
+scrollable, with clipboard copy and share-to-web.
 
 **Start state:** TASK-075, Phase 6 (component library) complete.
 
@@ -1227,14 +1227,24 @@ scrollable.
 message type. Chronological. Searchable. Per-entry copy to clipboard.
 Panel-level copy. Quest-attributed entries link to journal.
 
+Share-to-web: a share button adjacent to the copy icon publishes
+the current tab's content to a web service (Pastebin or GitHub
+Gist, selectable via popover) and copies the returned URL to
+clipboard. HTTP call via SKSE networking. No browser required.
+Nothing transmitted without explicit player action.
+
 **Definition of done:**
 - All message types appear under correct tabs
 - Search filters across all types
 - Copy single entry to clipboard
 - Copy entire tab to clipboard
 - Custom mod-registered type appears as its own tab
+- Share to Pastebin: URL returned and copied to clipboard
+- Share to GitHub Gist: URL returned and copied to clipboard
+- Share with no network: falls back to raw text clipboard copy
 
-**Reference:** `systems/message-log.md` § Message Log Panel
+**Reference:** `systems/message-log.md` § Message Log Panel,
+§ Share to web
 
 ---
 
@@ -1481,7 +1491,88 @@ and General Stores (barter/economy data).
 
 ---
 
-## Phase 13 — First-Party HUD Widgets
+## Phase 13 — Outfit System
+
+Requires TASK-051 (inventory screen) and TASK-053 (container screen)
+complete. TASK-004 (cosave) complete.
+
+---
+
+### TASK-115 · Player Outfit System
+
+**What:** Named equipment sets — save, browse, preview, equip from
+the inventory screen.
+
+**Start state:** TASK-051 (inventory screen), TASK-004 (cosave)
+complete.
+
+**End state:** Player can save the current equipment state as a
+named outfit. Outfit panel in inventory screen lists all saved
+outfits. Hovering an outfit updates character preview in real time
+and shows aggregate character impact delta. Equipping swaps all
+slots, flags missing items. Outfit management: rename, overwrite,
+duplicate, delete, reorder. Semantic label field for trigger mod
+integration. Outfits persisted in cosave Outfit Definitions block.
+
+**Definition of done:**
+- Save current equipment as named outfit
+- Browse outfit panel, hover shows preview and delta
+- Equip outfit — all slots swapped, missing items flagged
+- Rename, overwrite, duplicate, delete all functional
+- Save game, reload — outfits restored from cosave
+- Label field accepts freeform text, retrievable via API
+
+**Reference:** `systems/outfit-system.md`
+
+---
+
+### TASK-116 · Follower Outfit System
+
+**What:** Extend outfit system to followers via the container screen.
+
+**Start state:** TASK-115 (player outfits), TASK-053 (container
+screen) complete.
+
+**End state:** Follower container screen has an outfit panel in the
+header. Same behaviour as player outfit panel — browse, preview on
+follower in character viewport, character impact delta, equip in one
+action. Follower outfits managed per-follower. Outfit swap is
+immediate (no script queue). Label field for trigger mod integration.
+Per-follower outfit data persisted in cosave.
+
+**Definition of done:**
+- Save follower's current equipment as named outfit
+- Browse follower outfit panel, preview on follower viewport
+- Equip follower outfit — immediate swap, no script delay
+- Multiple followers maintain independent outfit lists
+- Save game, reload — follower outfits restored from cosave
+
+**Reference:** `systems/outfit-system.md` § Follower Outfits
+
+---
+
+### TASK-117 · Outfit Radial Integration
+
+**What:** Add outfit slot type to the favourites radial.
+
+**Start state:** TASK-115 (player outfits), TASK-069 (favourites
+radial) complete.
+
+**End state:** Outfit is available as a slot type in the favourites
+radial. Player can assign a saved outfit to a radial slot and equip
+it directly from the radial without opening inventory.
+
+**Definition of done:**
+- Assign an outfit to a radial slot
+- Activate slot — outfit equipped
+- Outfit deleted — radial slot shows empty/missing state
+
+**Reference:** `systems/outfit-system.md` § HUD Widget Integration,
+`screens/favourites-radial.md`
+
+---
+
+## Phase 14 — First-Party HUD Widgets
 
 Requires Phase 3 (DSL runtime) and TASK-014 (data binding schema)
 complete. Each widget is independent.
@@ -1695,16 +1786,17 @@ after a configurable duration. Stacks identical items.
 Phase 0 (TASK-001–005)
   ├── Phase 1 (TASK-010–014)  ← widget runtime + data binding schema
   │     ├── Phase 2 (TASK-020–022)  ← input
-  │     │     └── Phase 6 (TASK-050A–050H)  ← component library
+  │     │     └── Phase 6 (TASK-049–050H)  ← icon system + component library
   │     │           └── Phase 7 (TASK-051–069B)  ← screens
-  │     │                 └── Phase 12 (TASK-095–098)  ← frozen giants
+  │     │                 ├── Phase 12 (TASK-095–098)  ← frozen giants
+  │     │                 └── Phase 13 (TASK-115–117)  ← outfit system
   │     │
   │     └── Phase 9 (TASK-085–086)  ← mod integration (widget + binding registration)
   │
   ├── Phase 3 (TASK-025–028)  ← DSL runtime
   │     ├── Phase 6 (merges here — components need DSL)
   │     ├── Phase 8 (TASK-075–077)  ← message log
-  │     └── Phase 13 (TASK-100–109B)  ← first-party HUD widgets
+  │     └── Phase 14 (TASK-100–109B)  ← first-party HUD widgets
   │
   ├── Phase 4 (TASK-030–033)  ← MCM compat
   │     └── Phase 5 (TASK-040–043)  ← MCM2 native
@@ -1716,7 +1808,7 @@ Phase 0 (TASK-001–005)
 
 **Key dependency notes:**
 - Phase 3 (DSL runtime) is the architectural spine. Phase 6
-  (components) requires it. Phase 13 (HUD widgets) requires it.
+  (components) requires it. Phase 14 (HUD widgets) requires it.
   This is the critical path.
 - Phase 4 (MCM compat) is fully independent of Phases 1–3.
   Can be built in parallel by separate sessions.
@@ -1726,6 +1818,9 @@ Phase 0 (TASK-001–005)
   run alongside any phase.
 - Phase 12 (frozen giants) is late-stage and depends on multiple
   screens being complete.
+- Phase 13 (outfit system) depends on inventory and container
+  screens. TASK-117 (radial integration) depends on both TASK-115
+  and TASK-069.
 
 ---
 
@@ -1789,10 +1884,8 @@ design, or depend on prior phases being proven.
   maturity.
 - **Live character render on load game** — post-1.0 exploratory.
 - **Map live location preview** — post-1.0 exploratory.
-- **Share to web** — message log panel share button. Post-1.0,
-  requires web service infrastructure.
-- **Outfit system** — referenced by inventory, container, and
-  favourites radial. Needs its own design document before tasking.
+- **Outfit-to-UI theme pairing** — manual colour theme selection
+  per outfit. Post-1.0, data model slot included from day one.
 - **New Game+** — parked in `systems/new-game-plus.md`. Not in 1.0
   scope. Depends on further design discussion (heirloom items,
   faction standing feasibility, companion plugin scope).
