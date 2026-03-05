@@ -14,6 +14,7 @@ set(TEST_SOURCES
     BindingSchemaTests.cpp
     InputContextTests.cpp
     ActionRebindTests.cpp
+    ButtonPromptTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

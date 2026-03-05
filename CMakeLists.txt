@@ -88,6 +88,7 @@ set(CORE_SOURCES
     src/input/InputContextStack.cpp
     src/input/ActionRegistry.cpp
     src/input/RebindingStore.cpp
+    src/input/ButtonPromptResolver.cpp
     # Each task appends here
 )
 
@@ -123,6 +124,7 @@ set(CORE_HEADERS
     include/ohui/input/InputContextStack.h
     include/ohui/input/ActionRegistry.h
     include/ohui/input/RebindingStore.h
+    include/ohui/input/ButtonPromptResolver.h
     # Each task appends here
 )
 
