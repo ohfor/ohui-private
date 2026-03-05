@@ -9,10 +9,10 @@
 using namespace ohui;
 using namespace ohui::binding;
 
-TEST_CASE("GetBuiltinBindings returns all schema entries (count = 79)", "[schema]") {
+TEST_CASE("GetBuiltinBindings returns all schema entries (count = 84)", "[schema]") {
     const auto& bindings = BindingSchema::GetBuiltinBindings();
-    CHECK(bindings.size() == 79);
-    CHECK(BindingSchema::BuiltinBindingCount() == 79);
+    CHECK(bindings.size() == 84);
+    CHECK(BindingSchema::BuiltinBindingCount() == 84);
 }
 
 TEST_CASE("Each builtin has non-empty id, description, and valid type", "[schema]") {
@@ -34,7 +34,7 @@ TEST_CASE("RegisterBuiltinBindings registers all in engine", "[schema]") {
     DataBindingEngine engine;
     auto result = BindingSchema::RegisterBuiltinBindings(engine);
     REQUIRE(result.has_value());
-    CHECK(engine.BindingCount() == 79);
+    CHECK(engine.BindingCount() == 84);
 }
 
 TEST_CASE("Builtin bindings have correct types", "[schema]") {
@@ -119,7 +119,7 @@ TEST_CASE("Custom binding coexists with builtins", "[schema]") {
     BindingSchema::RegisterCustomBinding(engine, "mymod",
         "mymod.custom", BindingType::Float, "Custom",
         []() -> BindingValue { return 1.0f; });
-    CHECK(engine.BindingCount() == 80);
+    CHECK(engine.BindingCount() == 85);
 }
 
 TEST_CASE("RegisterCustomBinding with null poll function returns InvalidBinding", "[schema]") {
@@ -180,4 +180,29 @@ TEST_CASE("Time and world bindings present (10 with correct types)", "[schema]")
         }
     }
     CHECK(count == 10);
+}
+
+TEST_CASE("HUD widget bindings present with correct types", "[schema]") {
+    DataBindingEngine engine;
+    BindingSchema::RegisterBuiltinBindings(engine);
+
+    auto* heading = engine.GetBindingDefinition("player.heading");
+    REQUIRE(heading != nullptr);
+    CHECK(heading->type == BindingType::Float);
+
+    auto* detection = engine.GetBindingDefinition("player.detection.level");
+    REQUIRE(detection != nullptr);
+    CHECK(detection->type == BindingType::Float);
+
+    auto* breath = engine.GetBindingDefinition("player.breath.pct");
+    REQUIRE(breath != nullptr);
+    CHECK(breath->type == BindingType::Float);
+
+    auto* shoutWords = engine.GetBindingDefinition("equipped.shout.words");
+    REQUIRE(shoutWords != nullptr);
+    CHECK(shoutWords->type == BindingType::Int);
+
+    auto* hasTarget = engine.GetBindingDefinition("player.has.target");
+    REQUIRE(hasTarget != nullptr);
+    CHECK(hasTarget->type == BindingType::Bool);
 }

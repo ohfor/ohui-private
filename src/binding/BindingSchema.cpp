@@ -99,6 +99,13 @@ static const std::vector<SchemaEntry>& BuildSchema() {
         {"weather.temperature",        BindingType::Float,  "Current temperature",             PollRateCategory::ThrottledSlow},
         {"world.name",                 BindingType::String, "Current worldspace name",         PollRateCategory::OnEvent},
         {"world.is.interior",          BindingType::Bool,   "Player is in interior cell",      PollRateCategory::OnEvent},
+
+        // --- HUD Widget Bindings (5 mixed) ---
+        {"player.heading",             BindingType::Float,  "Compass heading 0-360",           PollRateCategory::PerFrame},
+        {"player.detection.level",     BindingType::Float,  "Detection level 0.0-1.0",         PollRateCategory::PerFrame},
+        {"player.breath.pct",          BindingType::Float,  "Breath percentage 0-1",           PollRateCategory::PerFrame},
+        {"equipped.shout.words",       BindingType::Int,    "Equipped shout word count 1-3",   PollRateCategory::OnEvent},
+        {"player.has.target",          BindingType::Bool,   "Whether enemy target exists",     PollRateCategory::PerFrame},
     };
     return schema;
 }
