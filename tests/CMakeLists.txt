@@ -21,6 +21,7 @@ set(TEST_SOURCES
     MCMRegistrationTests.cpp
     MCMCallbackTests.cpp
     MCMListManagerTests.cpp
+    MCM2ParserTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
