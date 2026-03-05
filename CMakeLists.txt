@@ -111,6 +111,8 @@ set(CORE_SOURCES
     src/dsl/handlers/TextHandlers.cpp
     src/dsl/handlers/ValueHandlers.cpp
     src/dsl/handlers/ContainerHandlers.cpp
+    src/dsl/handlers/NavigationHandlers.cpp
+    src/dsl/handlers/InputHandlers.cpp
     # Each task appends here
 )
 
@@ -174,6 +176,7 @@ set(CORE_HEADERS
     include/ohui/dsl/ComponentHandler.h
     include/ohui/dsl/DefaultTokens.h
     include/ohui/dsl/IconAtlas.h
+    include/ohui/dsl/ComponentStateStore.h
     # Each task appends here
 )
 

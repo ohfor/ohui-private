@@ -3,6 +3,8 @@
 #include "TextHandlers.h"
 #include "ValueHandlers.h"
 #include "ContainerHandlers.h"
+#include "NavigationHandlers.h"
+#include "InputHandlers.h"
 
 #include <algorithm>
 #include <cmath>
@@ -33,6 +35,16 @@ void ComponentRegistry::RegisterBuiltins() {
     Register("Modal", std::make_unique<ModalHandler>());
     Register("Tooltip", std::make_unique<TooltipHandler>());
     Register("Drawer", std::make_unique<DrawerHandler>());
+    Register("TabBar", std::make_unique<TabBarHandler>());
+    Register("Breadcrumb", std::make_unique<BreadcrumbHandler>());
+    Register("Pagination", std::make_unique<PaginationHandler>());
+    Register("TextInput", std::make_unique<TextInputHandler>());
+    Register("SearchField", std::make_unique<SearchFieldHandler>());
+    Register("Toggle", std::make_unique<ToggleHandler>());
+    Register("Slider", std::make_unique<SliderHandler>());
+    Register("Dropdown", std::make_unique<DropdownHandler>());
+    Register("Stepper", std::make_unique<StepperHandler>());
+    Register("ContextMenu", std::make_unique<ContextMenuHandler>());
 }
 
 // --- PanelHandler ---

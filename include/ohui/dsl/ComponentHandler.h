@@ -13,6 +13,8 @@
 
 namespace ohui::dsl {
 
+class ComponentStateStore;
+
 struct ComponentContext {
     const ComponentNode& node;
     layout::LayoutRect rect;
@@ -22,6 +24,7 @@ struct ComponentContext {
     std::function<std::string(const Expr&)> resolveString;
     std::function<float(const Expr&)> resolveFloat;
     std::function<Color(const std::string&)> parseColor;
+    ComponentStateStore* stateStore{nullptr};
 
     // Find a property by name on the current node
     const PropertyAssignment* FindProp(const std::string& name) const {
