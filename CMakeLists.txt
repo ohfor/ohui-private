@@ -92,6 +92,7 @@ set(CORE_SOURCES
     src/input/ButtonPromptResolver.cpp
     src/widget/ViewportManager.cpp
     src/dsl/DSLRuntimeEngine.cpp
+    src/mcm/MCMRegistrationEngine.cpp
     # Each task appends here
 )
 
@@ -134,6 +135,8 @@ set(CORE_HEADERS
     include/ohui/widget/ViewportManager.h
     include/ohui/dsl/DrawCall.h
     include/ohui/dsl/DSLRuntimeEngine.h
+    include/ohui/mcm/MCMTypes.h
+    include/ohui/mcm/MCMRegistrationEngine.h
     # Each task appends here
 )
 

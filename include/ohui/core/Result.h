@@ -25,6 +25,9 @@ enum class ErrorCode {
     BindingConflict,
     VersionMismatch,
     TypeError,
+    OptionNotFound,
+    PageNotFound,
+    InvalidState,
 };
 
 struct Error {
