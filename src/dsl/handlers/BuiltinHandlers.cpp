@@ -8,6 +8,8 @@
 #include "IndicatorHandlers.h"
 #include "MediaHandlers.h"
 #include "ListHandlers.h"
+#include "EditModeHandlers.h"
+#include "HUDHandlers.h"
 
 #include <algorithm>
 #include <cmath>
@@ -60,6 +62,16 @@ void ComponentRegistry::RegisterBuiltins() {
     Register("ListEntryCompact", std::make_unique<ListEntryCompactHandler>());
     Register("ScrollList", std::make_unique<ScrollListHandler>());
     Register("FacetedList", std::make_unique<FacetedListHandler>());
+    Register("WidgetBoundingBox", std::make_unique<WidgetBoundingBoxHandler>());
+    Register("AlignmentGuide", std::make_unique<AlignmentGuideHandler>());
+    Register("EditModeToolbar", std::make_unique<EditModeToolbarHandler>());
+    Register("GridOverlay", std::make_unique<GridOverlayHandler>());
+    Register("ResourceBar", std::make_unique<ResourceBarHandler>());
+    Register("ShoutMeter", std::make_unique<ShoutMeterHandler>());
+    Register("CompassRose", std::make_unique<CompassRoseHandler>());
+    Register("DetectionMeter", std::make_unique<DetectionMeterHandler>());
+    Register("StealthEye", std::make_unique<StealthEyeHandler>());
+    Register("NotificationToast", std::make_unique<NotificationToastHandler>());
 }
 
 // --- PanelHandler ---

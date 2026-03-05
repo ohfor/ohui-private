@@ -116,6 +116,8 @@ set(CORE_SOURCES
     src/dsl/handlers/IndicatorHandlers.cpp
     src/dsl/handlers/MediaHandlers.cpp
     src/dsl/handlers/ListHandlers.cpp
+    src/dsl/handlers/EditModeHandlers.cpp
+    src/dsl/handlers/HUDHandlers.cpp
     # Each task appends here
 )
 

@@ -42,6 +42,8 @@ set(TEST_SOURCES
     IndicatorComponentTests.cpp
     MediaComponentTests.cpp
     ListComponentTests.cpp
+    EditModeComponentTests.cpp
+    HUDComponentTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
