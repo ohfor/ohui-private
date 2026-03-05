@@ -31,6 +31,7 @@ set(TEST_SOURCES
     ModWidgetAPITests.cpp
     ModBindingAPITests.cpp
     MessageStreamTests.cpp
+    ComponentRegistryTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

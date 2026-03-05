@@ -2,12 +2,20 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "ohui/dsl/DSLRuntimeEngine.h"
+#include "ohui/dsl/ComponentHandler.h"
 #include "ohui/dsl/WidgetParser.h"
 
 using namespace ohui;
 using namespace ohui::dsl;
 using namespace ohui::binding;
 using namespace ohui::widget;
+
+// Helper to create a registry with builtins registered
+static ComponentRegistry MakeRegistry() {
+    ComponentRegistry reg;
+    reg.RegisterBuiltins();
+    return reg;
+}
 
 // Helper to parse a widget definition from string
 static ParseResult ParseInput(const std::string& input) {
@@ -53,7 +61,8 @@ TEST_CASE("Static Panel+Label produces DrawRect + DrawText", "[dsl-runtime]") {
 
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
@@ -92,7 +101,8 @@ TEST_CASE("HealthBar with bound values -- ValueBar fill 75% width", "[dsl-runtim
     (void)bindings.Subscribe("test-widget", "player.healthMax");
     bindings.Update(0.0f);
 
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
     ViewportRect vp{0, 0, 400, 300};
@@ -118,7 +128,8 @@ TEST_CASE("token() resolution -- DrawRect fill color matches token store", "[dsl
     TokenStore tokens;
     (void)tokens.LoadBaseTokens(":root { --health-color: #FF0000; }");
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
@@ -145,7 +156,8 @@ TEST_CASE("var() resolution through TokenStore", "[dsl-runtime]") {
     TokenStore tokens;
     // Don't define --primary, should use fallback
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
@@ -177,7 +189,8 @@ TEST_CASE("Skin token override changes draw call color", "[dsl-runtime]") {
     TokenStore tokens;
     (void)tokens.LoadBaseTokens(":root { --main-color: #FF0000; }");
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
@@ -217,7 +230,8 @@ TEST_CASE("Skin override without re-parse", "[dsl-runtime]") {
     TokenStore tokens;
     (void)tokens.LoadBaseTokens(":root { --bg: #AABBCC; }");
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
@@ -258,7 +272,8 @@ TEST_CASE("Skin with ControlTemplate changes draw structure", "[dsl-runtime]") {
     TokenStore tokens;
     (void)tokens.LoadBaseTokens(":root { --bg: #00FF00; }");
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
     REQUIRE(engine.ApplySkin(parsed.ast.skins[0]).has_value());
@@ -290,7 +305,8 @@ TEST_CASE("ClearSkin reverts draw calls to original", "[dsl-runtime]") {
     TokenStore tokens;
     (void)tokens.LoadBaseTokens(":root { --bg: #FF0000; }");
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
     REQUIRE(engine.ApplySkin(parsed.ast.skins[0]).has_value());
@@ -353,7 +369,8 @@ TEST_CASE("Layout recalculation on resize", "[dsl-runtime]") {
 
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
     ViewportRect vp1{0, 0, 400, 300};
@@ -384,7 +401,8 @@ TEST_CASE("Nested components -- 3-level nesting, correct positions", "[dsl-runti
 
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
     ViewportRect vp{10, 20, 400, 300};
@@ -404,7 +422,8 @@ TEST_CASE("Nested components -- 3-level nesting, correct positions", "[dsl-runti
 TEST_CASE("Widget not loaded returns error", "[dsl-runtime]") {
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     ViewportRect vp{0, 0, 400, 300};
     auto result = engine.Evaluate("NonExistent", vp, 0.0f);
@@ -426,7 +445,8 @@ TEST_CASE("Binding not found uses default value", "[dsl-runtime]") {
 
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
     ViewportRect vp{0, 0, 400, 300};
@@ -455,7 +475,8 @@ TEST_CASE("String binding -- DrawText text matches bound string", "[dsl-runtime]
     (void)bindings.Subscribe("test-widget", "player.name");
     bindings.Update(0.0f);
 
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
     ViewportRect vp{0, 0, 400, 300};
@@ -483,7 +504,8 @@ TEST_CASE("Multiple widgets evaluate independently", "[dsl-runtime]") {
 
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
 
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[1]).has_value());
@@ -548,7 +570,8 @@ TEST_CASE("ValueBar at 0% -- fill width is 0", "[dsl-runtime]") {
 
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
     ViewportRect vp{0, 0, 400, 300};
@@ -574,7 +597,8 @@ TEST_CASE("ValueBar at 100% -- fill width equals container width", "[dsl-runtime
 
     TokenStore tokens;
     DataBindingEngine bindings;
-    DSLRuntimeEngine engine(tokens, bindings);
+    auto registry = MakeRegistry();
+    DSLRuntimeEngine engine(tokens, bindings, registry);
     REQUIRE(engine.LoadWidget(parsed.ast.widgets[0]).has_value());
 
     ViewportRect vp{0, 0, 400, 300};

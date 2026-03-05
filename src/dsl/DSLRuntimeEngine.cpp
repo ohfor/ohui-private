@@ -35,8 +35,9 @@ float AnimationState::CurrentValue() const {
 
 // --- DSLRuntimeEngine ---
 
-DSLRuntimeEngine::DSLRuntimeEngine(TokenStore& tokens, binding::DataBindingEngine& bindings)
-    : m_tokens(tokens), m_bindings(bindings) {}
+DSLRuntimeEngine::DSLRuntimeEngine(TokenStore& tokens, binding::DataBindingEngine& bindings,
+                                   ComponentRegistry& registry)
+    : m_tokens(tokens), m_bindings(bindings), m_registry(registry) {}
 
 Result<void> DSLRuntimeEngine::LoadWidget(const WidgetDef& def) {
     WidgetRuntime runtime;
@@ -226,138 +227,17 @@ void DSLRuntimeEngine::EmitDrawCalls(const ComponentNode& node,
     float absX = parentX + rect.left;
     float absY = parentY + rect.top;
 
-    auto findProp = [&](const std::string& name) -> const PropertyAssignment* {
-        for (const auto& pa : node.properties) {
-            if (pa.name == name) return &pa;
-        }
-        return nullptr;
-    };
-
-    if (node.typeName == "Panel") {
-        DrawRect dr;
-        dr.x = absX;
-        dr.y = absY;
-        dr.width = rect.width;
-        dr.height = rect.height;
-
-        if (auto* p = findProp("fillColor")) {
-            dr.fillColor = ParseColor(ResolveExprToString(p->value, runtime));
-        } else if (auto* p2 = findProp("backgroundColor")) {
-            dr.fillColor = ParseColor(ResolveExprToString(p2->value, runtime));
-        } else if (auto* p3 = findProp("color")) {
-            dr.fillColor = ParseColor(ResolveExprToString(p3->value, runtime));
-        }
-        if (auto* p = findProp("opacity")) {
-            dr.opacity = ResolveExprToFloat(p->value, runtime);
-        }
-        if (auto* p = findProp("borderWidth")) {
-            dr.borderWidth = ResolveExprToFloat(p->value, runtime);
-        }
-        if (auto* p = findProp("borderColor")) {
-            dr.borderColor = ParseColor(ResolveExprToString(p->value, runtime));
-        }
-        if (auto* p = findProp("borderRadius")) {
-            dr.borderRadius = ResolveExprToFloat(p->value, runtime);
-        }
-
-        output.calls.push_back({DrawCallType::Rect, dr, 0});
-
-    } else if (node.typeName == "Label") {
-        DrawText dt;
-        dt.x = absX;
-        dt.y = absY;
-        dt.width = rect.width;
-        dt.height = rect.height;
-
-        if (auto* p = findProp("text")) {
-            dt.text = ResolveExprToString(p->value, runtime);
-        }
-        if (auto* p = findProp("fontSize")) {
-            dt.fontSize = ResolveExprToFloat(p->value, runtime);
-        }
-        if (auto* p = findProp("fontFamily")) {
-            dt.fontFamily = ResolveExprToString(p->value, runtime);
-        }
-        if (auto* p = findProp("color")) {
-            dt.color = ParseColor(ResolveExprToString(p->value, runtime));
-        }
-        if (auto* p = findProp("textAlign")) {
-            auto val = ResolveExprToString(p->value, runtime);
-            if (val == "center") dt.align = TextAlign::Center;
-            else if (val == "right") dt.align = TextAlign::Right;
-        }
-        if (auto* p = findProp("opacity")) {
-            dt.opacity = ResolveExprToFloat(p->value, runtime);
-        }
-
-        output.calls.push_back({DrawCallType::Text, dt, 0});
-
-    } else if (node.typeName == "ValueBar") {
-        // Background rect
-        DrawRect bg;
-        bg.x = absX;
-        bg.y = absY;
-        bg.width = rect.width;
-        bg.height = rect.height;
-        if (auto* p = findProp("backgroundColor")) {
-            bg.fillColor = ParseColor(ResolveExprToString(p->value, runtime));
-        }
-        output.calls.push_back({DrawCallType::Rect, bg, 0});
-
-        // Fill rect
-        float value = 0.0f;
-        float maxValue = 100.0f;
-        if (auto* p = findProp("value")) {
-            value = ResolveExprToFloat(p->value, runtime);
-        }
-        if (auto* p = findProp("maxValue")) {
-            maxValue = ResolveExprToFloat(p->value, runtime);
-        }
-        float ratio = (maxValue > 0.0f) ? std::clamp(value / maxValue, 0.0f, 1.0f) : 0.0f;
-
-        DrawRect fill;
-        fill.x = absX;
-        fill.y = absY;
-        fill.width = rect.width * ratio;
-        fill.height = rect.height;
-        if (auto* p = findProp("fillColor")) {
-            fill.fillColor = ParseColor(ResolveExprToString(p->value, runtime));
-        }
-        if (auto* p = findProp("opacity")) {
-            fill.opacity = ResolveExprToFloat(p->value, runtime);
-        }
-        output.calls.push_back({DrawCallType::Rect, fill, 0});
-
-    } else if (node.typeName == "Icon") {
-        DrawIcon di;
-        di.x = absX;
-        di.y = absY;
-        di.width = rect.width;
-        di.height = rect.height;
-        if (auto* p = findProp("source")) {
-            di.source = ResolveExprToString(p->value, runtime);
-        }
-        if (auto* p = findProp("tint")) {
-            di.tint = ParseColor(ResolveExprToString(p->value, runtime));
-        }
-        if (auto* p = findProp("opacity")) {
-            di.opacity = ResolveExprToFloat(p->value, runtime);
-        }
-        output.calls.push_back({DrawCallType::Icon, di, 0});
-
-    } else if (node.typeName == "Image") {
-        DrawImage dim;
-        dim.x = absX;
-        dim.y = absY;
-        dim.width = rect.width;
-        dim.height = rect.height;
-        if (auto* p = findProp("source")) {
-            dim.source = ResolveExprToString(p->value, runtime);
-        }
-        if (auto* p = findProp("opacity")) {
-            dim.opacity = ResolveExprToFloat(p->value, runtime);
-        }
-        output.calls.push_back({DrawCallType::Image, dim, 0});
+    auto* handler = m_registry.Get(node.typeName);
+    if (handler) {
+        ComponentContext ctx{
+            node, rect, absX, absY,
+            [&](const Expr& e) { return ResolveExprToString(e, runtime); },
+            [&](const Expr& e) { return ResolveExprToFloat(e, runtime); },
+            [&](const std::string& v) { return ParseColor(v); }
+        };
+        handler->Emit(ctx, output);
+    } else if (!node.typeName.empty()) {
+        ohui::log::debug("Unknown component type '{}', skipping draw calls", node.typeName);
     }
 
     // Recurse into children

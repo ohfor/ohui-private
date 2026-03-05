@@ -3,6 +3,7 @@
 #include "ohui/dsl/DrawCall.h"
 #include "ohui/dsl/WidgetAST.h"
 #include "ohui/dsl/TokenStore.h"
+#include "ohui/dsl/ComponentHandler.h"
 #include "ohui/binding/DataBindingEngine.h"
 #include "ohui/widget/IViewportWidget.h"
 #include "ohui/layout/YogaWrapper.h"
@@ -28,7 +29,8 @@ struct AnimationState {
 
 class DSLRuntimeEngine {
 public:
-    DSLRuntimeEngine(TokenStore& tokens, binding::DataBindingEngine& bindings);
+    DSLRuntimeEngine(TokenStore& tokens, binding::DataBindingEngine& bindings,
+                     ComponentRegistry& registry);
 
     Result<void> LoadWidget(const WidgetDef& def);
     Result<void> ApplySkin(const SkinDef& skin);
@@ -74,6 +76,7 @@ private:
 
     TokenStore& m_tokens;
     binding::DataBindingEngine& m_bindings;
+    ComponentRegistry& m_registry;
     std::unordered_map<std::string, WidgetRuntime> m_widgets;
 };
 

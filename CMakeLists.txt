@@ -104,6 +104,8 @@ set(CORE_SOURCES
     src/widget/ModWidgetAPI.cpp
     src/binding/ModBindingAPI.cpp
     src/message/MessageStream.cpp
+    src/dsl/ComponentRegistry.cpp
+    src/dsl/handlers/BuiltinHandlers.cpp
     # Each task appends here
 )
 
@@ -164,6 +166,7 @@ set(CORE_HEADERS
     include/ohui/binding/ModBindingAPI.h
     include/ohui/message/MessageTypes.h
     include/ohui/message/MessageStream.h
+    include/ohui/dsl/ComponentHandler.h
     # Each task appends here
 )
 
