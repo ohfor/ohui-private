@@ -9,6 +9,7 @@ set(TEST_SOURCES
     TokenStoreTests.cpp
     WidgetRegistryTests.cpp
     DataBindingTests.cpp
+    LayoutProfileTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

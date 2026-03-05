@@ -17,6 +17,7 @@ enum class ErrorCode {
     WidgetNotFound,
     BindingNotFound,
     InvalidBinding,
+    ProfileNotFound,
 };
 
 struct Error {

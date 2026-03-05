@@ -79,6 +79,7 @@ set(CORE_SOURCES
     src/layout/YogaWrapper.cpp
     src/widget/WidgetRegistry.cpp
     src/binding/DataBindingEngine.cpp
+    src/widget/LayoutProfileManager.cpp
     # Each task appends here
 )
 
@@ -100,6 +101,8 @@ set(CORE_HEADERS
     include/ohui/widget/WidgetRegistry.h
     include/ohui/binding/BindingTypes.h
     include/ohui/binding/DataBindingEngine.h
+    include/ohui/widget/LayoutProfile.h
+    include/ohui/widget/LayoutProfileManager.h
     # Each task appends here
 )
 
