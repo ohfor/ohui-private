@@ -110,6 +110,7 @@ set(CORE_SOURCES
     src/dsl/IconAtlas.cpp
     src/dsl/handlers/TextHandlers.cpp
     src/dsl/handlers/ValueHandlers.cpp
+    src/dsl/handlers/ContainerHandlers.cpp
     # Each task appends here
 )
 

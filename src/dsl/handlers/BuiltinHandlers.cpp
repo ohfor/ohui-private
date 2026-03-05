@@ -2,6 +2,7 @@
 #include "AtomHandlers.h"
 #include "TextHandlers.h"
 #include "ValueHandlers.h"
+#include "ContainerHandlers.h"
 
 #include <algorithm>
 #include <cmath>
@@ -27,6 +28,11 @@ void ComponentRegistry::RegisterBuiltins() {
     Register("DeltaList", std::make_unique<DeltaListHandler>());
     Register("TimerBar", std::make_unique<TimerBarHandler>());
     Register("CountBadge", std::make_unique<CountBadgeHandler>());
+    Register("SplitPanel", std::make_unique<SplitPanelHandler>());
+    Register("ScrollPanel", std::make_unique<ScrollPanelHandler>());
+    Register("Modal", std::make_unique<ModalHandler>());
+    Register("Tooltip", std::make_unique<TooltipHandler>());
+    Register("Drawer", std::make_unique<DrawerHandler>());
 }
 
 // --- PanelHandler ---

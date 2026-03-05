@@ -36,6 +36,7 @@ set(TEST_SOURCES
     IconAtlasTests.cpp
     TextComponentTests.cpp
     ValueComponentTests.cpp
+    ContainerComponentTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
