@@ -98,6 +98,8 @@ set(CORE_SOURCES
     src/mcm/MCM2DefinitionParser.cpp
     src/mcm/MCM2ConditionEngine.cpp
     src/mcm/MCM2PersistenceManager.cpp
+    src/mcm/MCM2DefinitionDiff.cpp
+    src/mcm/MCM2HotReloadEngine.cpp
     # Each task appends here
 )
 
@@ -149,6 +151,8 @@ set(CORE_HEADERS
     include/ohui/mcm/MCM2ConditionTypes.h
     include/ohui/mcm/MCM2ConditionEngine.h
     include/ohui/mcm/MCM2PersistenceManager.h
+    include/ohui/mcm/MCM2DefinitionDiff.h
+    include/ohui/mcm/MCM2HotReloadEngine.h
     # Each task appends here
 )
 

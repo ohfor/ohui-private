@@ -24,6 +24,8 @@ set(TEST_SOURCES
     MCM2ParserTests.cpp
     MCM2ConditionTests.cpp
     MCM2PersistenceTests.cpp
+    MCM2DiffTests.cpp
+    MCM2HotReloadTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

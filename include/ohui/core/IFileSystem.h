@@ -20,6 +20,8 @@ public:
     virtual bool RenameFile(
         const std::filesystem::path& from,
         const std::filesystem::path& to) const = 0;
+    virtual std::optional<std::filesystem::file_time_type>
+        GetModificationTime(const std::filesystem::path& path) const = 0;
 };
 
 }  // namespace ohui

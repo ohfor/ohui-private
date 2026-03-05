@@ -12,6 +12,7 @@ public:
     std::unordered_map<std::string, std::vector<uint8_t>> files;
     mutable std::unordered_map<std::string, std::vector<uint8_t>> written;
     bool renameFailure = false;
+    mutable std::unordered_map<std::string, std::filesystem::file_time_type> modTimes;
 
     std::vector<uint8_t> ReadFile(
             const std::filesystem::path& path) const override {
@@ -54,6 +55,17 @@ public:
             return true;
         }
         return false;
+    }
+
+    std::optional<std::filesystem::file_time_type>
+        GetModificationTime(const std::filesystem::path& path) const override {
+        auto key = path.string();
+        auto it = modTimes.find(key);
+        if (it != modTimes.end()) return it->second;
+        if (files.contains(key) || written.contains(key)) {
+            return std::filesystem::file_time_type::clock::now();
+        }
+        return std::nullopt;
     }
 };
 
