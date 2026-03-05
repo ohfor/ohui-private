@@ -254,7 +254,7 @@ raw number is available on hover for players who want it.
 **Price modifier** — the direct consequence of disposition, surfaced plainly.
 "This merchant is charging you 18% above base price" or "This merchant is
 offering you 12% above base value for your items." No arithmetic required
-from the player. The screen does the calculation and states the result.
+from the player. OHUI displays the pricing values the engine provides.
 
 **Factors contributing to disposition:**
 - Speech skill level and relevant perks
@@ -619,6 +619,10 @@ show the character wearing that item. The change is immediate. Moving off the it
 reverts to the current equipped state. The player is trying on armour in a mirror
 before committing.
 
+This works cleanly because the character preview renders a clone of the player
+actor in OHUI's photobooth cell. The preview item is applied to the clone only.
+The actual player actor and their actual equipment are untouched throughout.
+
 This connects directly to item comparison — the stats panel shows the delta,
 the character preview shows the visual. Both update simultaneously on hover.
 The player sees the number and the look at the same time.
@@ -672,9 +676,9 @@ A destruction spell listed at 40 magicka cost does not cost 40 magicka at 15
 Destruction. The displayed stat is the theoretical maximum. The actual value
 depends entirely on the player's skill level.
 
-OHUI surfaces the skill-adjusted value as the primary stat. The base value is
-still present but secondary. What the player sees first is what the item will
-actually do in their hands today.
+OHUI displays the skill-adjusted values the engine provides as the primary
+stat. The base value is still present but secondary. What the player sees
+first is what the item will actually do in their hands today.
 
 **The honest warning:**
 When equipping an item would result in significantly reduced effectiveness due
@@ -716,8 +720,8 @@ The same principle applies to:
 - Encumbrance delta — how much this swap adds to or removes from current carried
   weight
 - Carry weight remaining after the swap
-- Movement speed delta — the net change in movement speed accounting for armour
-  weight, relevant perks, and encumbrance threshold
+- Movement speed delta — OHUI displays the movement speed values the engine
+  provides for the current and projected equipment states
 
 "Equipping this armour adds 25 to your encumbrance and reduces movement speed
 by 8%."

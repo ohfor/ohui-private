@@ -80,8 +80,8 @@ assigned. On entry:
 
 - All active widgets gain a visible bounding rectangle overlay
 - Widget labels appear showing each widget's name
-- The game is paused or slowed (configurable — full pause or slow
-  motion, default full pause)
+- The game slows to a configurable timescale (default 10%, effectively
+  paused but widgets remain live for layout preview)
 - A minimal edit mode toolbar appears at a fixed screen position
   outside the widget canvas
 
@@ -144,18 +144,14 @@ the widget on the canvas.
 
 **A widget must provide:**
 
-```cpp
-struct WidgetManifest {
-    std::string id;          // Unique identifier. Stable across versions.
-    std::string displayName; // Human-readable name shown in edit mode.
-    Vec2        defaultPos;  // Starting position on a 1920×1080 canvas.
-                             // Runtime scales to actual resolution.
-    Vec2        defaultSize; // Starting size.
-    Vec2        minSize;     // Minimum size the skin can render.
-    Vec2        maxSize;     // Maximum size. {0,0} = unconstrained.
-    bool        defaultVisible; // Whether active by default on first run.
-};
-```
+- **ID** — unique identifier, stable across versions
+- **Display name** — human-readable name shown in edit mode
+- **Default position** — starting position on a 1920×1080 canvas
+  (runtime scales to actual resolution)
+- **Default size** — starting size
+- **Minimum size** — minimum size the skin can render
+- **Maximum size** — {0,0} for unconstrained
+- **Default visible** — whether active by default on first run
 
 That is the complete contract. The runtime asks for nothing else.
 
@@ -213,40 +209,22 @@ at the center of the screen at any resolution. A widget with a width of
 200 in the canvas definition occupies the same proportional screen
 fraction at 2560×1440 as at 1920×1080.
 
-Ultrawide support is a first-class concern. Widgets positioned near
-screen edges in 16:9 are not orphaned at 21:9. The runtime provides
-an anchor system — widgets can be anchored to screen edges or the
-screen center, and their positions are calculated relative to their
-anchor point after resolution scaling. A widget anchored to the right
-edge stays near the right edge at any aspect ratio.
+Ultrawide support is a first-class concern and is solved by the layout
+profile system, not the runtime. OHUI ships first-party layout presets
+for 16:9, 21:9, 32:9, and 16:10. On first launch OHUI detects the
+display aspect ratio and activates the appropriate preset. Each preset
+defines sensible default positions for every first-party widget at
+that aspect ratio. A player who switches to an ultrawide monitor picks
+the 21:9 preset and widgets are where they should be. No runtime
+anchor system required.
 
 ---
 
 ## The Simplest Complete Example
 
-A static text widget. The complete implementation from the runtime's
-perspective:
-
-```cpp
-// Widget registration
-WidgetManifest manifest {
-    .id             = "ohui.example.static_label",
-    .displayName    = "Example Label",
-    .defaultPos     = {100, 100},
-    .defaultSize    = {200, 30},
-    .minSize        = {40, 16},
-    .maxSize        = {0, 0},   // unconstrained
-    .defaultVisible = true
-};
-Runtime::RegisterWidget(manifest, &ExampleLabelWidget::instance);
-
-// Widget implementation
-class ExampleLabelWidget : public IWidget {
-    void Draw(const WidgetContext& ctx) override {
-        DrawText(ctx.bounds, "Hello, Skyrim", ctx.skin->GetTextStyle());
-    }
-};
-```
+A static text widget. It declares its manifest (ID, display name,
+default position, size, and visibility), registers with the runtime,
+and draws text into whatever bounds the runtime provides.
 
 The runtime handles everything else. Position, size, visibility, edit
 mode interaction, layout persistence, resolution scaling. The widget
@@ -277,3 +255,19 @@ stays stable, and stays ignorant of everything above it.
 
 This is the correct architecture for a system that needs to outlast
 the mods built on it.
+
+---
+
+## Non-Scaleform Overlays
+
+Some HUD mods render outside Scaleform entirely — TrueHUD and Wheeler
+use D3D11 hooks and ImGui to draw directly to the screen, bypassing
+the Scaleform layer. These overlays exist outside OHUI's render
+pipeline. OHUI does not composite them, does not manage their draw
+order, and cannot apply skins or USS styling to their content.
+
+These mods still participate in OHUI's layout system at the viewport
+floor level — OHUI can manage their position, size, and visibility
+through edit mode and layout profiles. The pixels inside the viewport
+are the mod's responsibility. OHUI provides the canvas management
+around them.

@@ -101,10 +101,10 @@ to live Skyrim data. One schema per game. The DSL is unaware of it.
 
 ```
 // Skyrim data binding schema (excerpt)
-binding player.health.current  → float  [polls: ActorValueInfo.health]
-binding player.health.maximum  → float  [polls: ActorValueInfo.health.max]
-binding player.shout.cooldown  → float  [polls: TESGlobal.ShoutRecovery]
-binding player.level           → int    [polls: Actor.GetLevel]
+binding player.health.current  → float
+binding player.health.maximum  → float
+binding player.shout.cooldown  → float
+binding player.level           → int
 ```
 
 Widget instances declare which schema bindings feed their properties:
@@ -187,8 +187,8 @@ properties for game-specific needs.
 
 USS is Unity UI Toolkit's styling format — plain text, CSS-derived
 syntax, well-documented, supported by existing tooling (syntax
-highlighting, validators). OHUI implements its own parser and
-rendering backend. The format is not coupled to Unity's runtime.
+highlighting, validators). The format is adopted for authoring. It
+is not coupled to Unity's runtime.
 
 **Why USS rather than a bespoke format:** any skin author who knows
 CSS or has worked with Unity UI Toolkit can contribute from day one.
@@ -215,11 +215,6 @@ USS's standard property set does not cover everything game UI needs.
 OHUI adds a defined set of extensions:
 
 ```css
-/* Anchor semantics — HUD element edge anchoring */
--ohui-anchor: bottom-right;
--ohui-anchor-offset-x: 20px;
--ohui-anchor-offset-y: 20px;
-
 /* Glow and edge effects */
 -ohui-glow: 0 0 8px rgba(255, 0, 0, 0.6);
 -ohui-edge-fade: 12px;
@@ -262,8 +257,10 @@ based layout model handles the vast majority of menu and component
 layout requirements without requiring absolute positioning.
 
 HUD element positioning is not handled by Yoga — it is handled by
-the data binding engine and the anchor system. Static stylesheets are
-the wrong layer for positioning elements driven by runtime data.
+layout profiles. Where a widget sits on screen is a player configuration
+concern, not a style concern. Resolution presets ship default positions
+for each supported aspect ratio. The style layer describes appearance.
+It does not determine canvas position.
 
 ### Coverage Summary
 
@@ -273,7 +270,7 @@ the wrong layer for positioning elements driven by runtime data.
 | MCM config panels | ~75% |
 | Component visual styling | ~85% |
 | HUD element visual styling | ~85% |
-| HUD element positioning | Data binding layer, not style |
+| HUD element positioning | Layout profiles, not style |
 | Animations and transitions | ~70% |
 | Radial layouts | Dedicated component, -ohui- extensions |
 
@@ -306,15 +303,6 @@ their own rendering into the OHUI-allocated surface.
 They still participate fully in the widget runtime — edit mode,
 layout profiles, skin chrome, input coordination. Only the pixels
 inside the viewport are C++'s responsibility.
-
-```cpp
-class MinimapWidget : public IWidget {
-    void Draw(const WidgetContext& ctx) override {
-        // Direct engine rendering into ctx.viewport
-        // OHUI composites the result
-    }
-};
-```
 
 ### Path 3 — Third-party viewport (open)
 

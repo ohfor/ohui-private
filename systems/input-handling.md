@@ -86,40 +86,10 @@ Mods do not register handlers for physical inputs. They register
 **named actions** in a named context. Physical inputs are mapped to
 actions separately, by the player or by default bindings.
 
-```cpp
-// Declare a context
-OHUI::Input::RegisterContext("com.mymod.browsing");
-
-// Register actions within it
-OHUI::Input::RegisterAction("com.mymod.browsing", {
-    .id:             "select",
-    .displayName:    "Select Item",
-    .defaultKeyboard: Key::Enter,
-    .defaultController: Button::A,
-    .handler:        &OnSelect
-});
-
-OHUI::Input::RegisterAction("com.mymod.browsing", {
-    .id:             "close",
-    .displayName:    "Close",
-    .defaultKeyboard: Key::Escape,
-    .defaultController: Button::B,
-    .handler:        &OnClose
-});
-```
-
-```papyrus
-; Papyrus action registration
-OHUI_Input.RegisterAction(
-    contextId = "com.mymod.browsing",
-    actionId = "select",
-    displayName = "Select Item",
-    defaultKey = 28,        ; Enter
-    defaultPad = 0,         ; A button
-    handler = self,
-    functionName = "OnSelect"
-)
-```
+A mod declares a named context, then registers named actions within
+it — each with a display name, default keyboard key, default controller
+button, and handler. Registration is available from both native code
+and Papyrus.
 
 **Consequences:**
 
@@ -138,18 +108,10 @@ OHUI_Input.RegisterAction(
 
 ### Pushing a Context
 
-```cpp
-OHUI::Input::PushContext("com.mymod.browsing");
-```
-
 The pushed context becomes the active context immediately. All input
 is routed to it. The previous context receives nothing.
 
 ### Popping a Context
-
-```cpp
-OHUI::Input::PopContext("com.mymod.browsing");
-```
 
 The context is removed from the stack. The context below it becomes
 active again. If the specified context is not the top of the stack,

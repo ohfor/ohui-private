@@ -136,12 +136,14 @@ with no way to target a specific time.
 
 OHUI removes the 24-hour cap. The wait screen offers:
 
-**Extended slider** — beyond 24 hours, the slider extends to cover multiple days.
-Configurable maximum (default 72 hours, player-adjustable).
+**Extended slider** — the slider covers up to 72 hours by default. The maximum
+is player-configurable upward with no hard cap.
 
-**Time picker** — a direct input for target time. "Wait until 8am tomorrow."
-"Wait until the 15th of Hearthfire." The player specifies a destination rather
-than a duration. Calculated automatically from current game time.
+**Time picker** — a direct input for target time, available alongside the slider
+for players who want to specify a destination rather than a duration. "Wait until
+8am tomorrow." "Wait until the 15th of Hearthfire." Calculated automatically from
+current game time. The slider and the time picker are two inputs to the same
+underlying value — adjusting one updates the other.
 
 **Quick increments** — one-tap buttons for common wait durations. 1 hour, 8 hours,
 24 hours, 3 days. Configurable. The most common case should be the fastest.

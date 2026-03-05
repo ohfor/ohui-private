@@ -52,29 +52,29 @@ migration path away from the NIF workaround. Authors who have been
 maintaining plane mesh NIFs for years can ship a flat image instead.
 The result is identical. The authoring overhead is a fraction.
 
-### Tier 3 — Live Animated Scenes
+### Tier 3 — Live Animated Scenes (Exploratory)
 
-The headline tier. A real-time animated 3D scene rendered in a native
-C++ viewport — the same mechanism used for NPC portraits in the dialogue
-screen, live location preview in the map screen, and character preview
-in the inventory screen — playing while the game loads in the background.
+A real-time animated 3D scene running in a dedicated render target while
+the game loads in the background. Not a pre-rendered video. Not a looping
+NIF. An actual live scene with geometry, lighting, and skeletal animation.
 
-Not a pre-rendered video. Not a looping NIF animation baked to a texture.
-An actual live scene with geometry, dynamic lighting, weather effects,
-and full skeletal animation running in real time. The same engine that
-renders the game world, rendering a curated scene in a dedicated viewport,
-while the next cell loads.
+This is a separate engineering problem from the actor viewport system.
+The actor viewport renders a live game actor from the already-loaded
+world. A loading screen scene has no game world — it requires a
+self-contained render context that can run independently of the main
+engine renderer while a cell is loading. These are different systems.
 
-The scene is authored specifically for the loading screen. Not repurposed
-from the game world. Designed to look extraordinary in a fixed frame with
-a fixed camera, for a duration of anywhere from five seconds to two
-minutes depending on the load.
+**This tier is exploratory.** The design intent is clear and the ambition
+is right, but the implementation path needs investigation before this
+becomes a hard deliverable. Specifically: whether a self-contained NIF
+scene can be rendered to a texture independently of the main renderer
+while cell loading is in progress, without introducing load time
+regression or instability, is an open question that requires a prototype
+to answer.
 
-**The camera is not static.** A slow automated pan, a subtle parallax
-drift, a gradual push toward a focal point. The scene is alive for the
-entire duration of the load. It does not loop awkwardly at a fixed point
-— the camera movement is designed to sustain indefinitely without feeling
-repetitive.
+Tier 3 will be designed and attempted when the time is right. It is not
+a launch commitment. Tier 2 (native 2D images) is the launch-scope
+loading screen improvement. Tier 3 is the ambition beyond that.
 
 ---
 
@@ -117,24 +117,11 @@ not absolute — variety is preserved.
 Any mod can register loading screen scenes at any tier. The registration
 API is consistent with the rest of OHUI's mod author contracts:
 
-**2D image registration:**
-```
-OHUI_LoadingScreen.RegisterImage(
-    imagePath:   "Data/Textures/MyMod/loading_solstheim.dds",
-    caption:     "The ash plains of Solstheim",
-    conditions:  ["cell:solstheim"]
-)
-```
+**2D image registration:** the mod provides an image path, an optional
+caption, and optional conditions. OHUI handles the rest.
 
-**3D scene registration:**
-```
-OHUI_LoadingScreen.RegisterScene(
-    scenePath:   "Data/MyMod/LoadingScenes/ash_storm.nif",
-    cameraAnim:  "Data/MyMod/LoadingScenes/ash_storm_cam.hkx",
-    caption:     "Ash storms roll in without warning",
-    conditions:  ["cell:solstheim", "weather:ashstorm"]
-)
-```
+**3D scene registration:** the mod provides a scene path, camera
+animation path, optional caption, and optional conditions.
 
 A mod set in Solstheim ships Solstheim loading scenes. A city mod ships
 that city's atmosphere as a loading scene — narrow streets at night, the

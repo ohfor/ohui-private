@@ -22,10 +22,17 @@ worth more than novelty.
 ## Entering and Exiting Edit Mode
 
 Edit mode is entered via a dedicated keybind (default: configurable, no vanilla conflict)
-or via the OHUI settings menu. The game does not pause. The HUD remains live — health
-bars still update, the compass still moves. The player is editing their layout in context,
-against a real game state. This is intentional: it means the player can see exactly how
-their layout behaves before committing.
+or via the OHUI settings menu. The game slows to a configurable timescale on entry
+(default: 10% — nearly paused but not fully frozen). The HUD remains live — health bars
+still update, the compass still reflects actual heading. The player is editing their
+layout against a real game state at near-standstill, which means they can see exactly
+how their layout behaves before committing without worrying about incoming damage.
+
+The timescale is player-configurable from 0% (full pause) to 100% (real time). Full
+pause is available for players who want it. Real time is available for players who want
+to test their layout under live conditions. The default of 10% is the practical sweet
+spot: effectively paused for purposes of safety, live enough to show widget animations
+and data updates.
 
 Exiting saves the current layout automatically. A separate "save as preset" option is
 available. The previous layout is preserved as an undo state for the session.

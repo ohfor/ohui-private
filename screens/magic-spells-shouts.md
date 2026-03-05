@@ -2,14 +2,18 @@
 
 ## Shared Foundation
 
-The Magic screen is structurally the same `TabbedListPanel` pattern as the inventory
-screen — a category tab bar, a filterable and sortable list, a detail panel, and
-action buttons. The data is spell and power data rather than item data. The tabs are
-spell schools rather than item categories. The component is the same.
+The Magic screen uses the same `FacetedList` pattern as the inventory screen — a
+searchable, filterable list, a detail panel, and action buttons. The data is spell
+and power data rather than item data. The component is the same.
 
 All inventory screen features that apply to lists apply here: text search, extended
-sorting, extended filtering, detail panel depth. The Magic screen is not a separate
+sorting, facet-based filtering, detail panel depth. The Magic screen is not a separate
 design problem — it is the same component configured for spells and powers.
+
+Spell schools are facets, not tabs. Multi-select is supported — a player can filter
+to Destruction and Restoration simultaneously. The PresetBar provides quick-tap
+school presets for the common single-school browsing case. This replaces the earlier
+TabbedListPanel approach.
 
 ---
 

@@ -18,12 +18,11 @@ everything else builds on.
 **What:** Embed the Yoga layout engine into the OHUI C++ project and
 expose a thin wrapper that OHUI's layout pass calls.
 
-**Start state:** Empty OHUI C++ project with CommonLib/SKSE scaffold.
+**Start state:** Empty OHUI project with SKSE scaffold.
 
-**End state:** A `YogaLayout` class that accepts a tree of nodes with
+**End state:** A layout module that accepts a tree of nodes with
 USS-derived flex properties, runs layout, and returns computed
-`{x, y, width, height}` rectangles for each node. No rendering.
-Layout only.
+rectangles for each node. No rendering. Layout only.
 
 **Definition of done:**
 - Unit tests: column stack, row stack, nested flex, min/max
@@ -42,11 +41,11 @@ property bag per selector rule.
 **Start state:** TASK-001 complete (Yoga integration, so layout
 properties have a consumer).
 
-**End state:** `USSParser::Parse(string)` returns a structured
-rule set. Rules contain: selectors (type, class, id, pseudo-class),
-and a property map of standard USS properties plus the defined
-`-ohui-` extensions. Invalid properties are logged and skipped.
-No rendering. No layout. Parsing only.
+**End state:** A USS parser that returns a structured rule set. Rules
+contain: selectors (type, class, id, pseudo-class), and a property
+map of standard USS properties plus the defined `-ohui-` extensions.
+Invalid properties are logged and skipped. No rendering. No layout.
+Parsing only.
 
 **Definition of done:**
 - Parses all standard USS visual properties
@@ -68,11 +67,11 @@ to all widgets.
 
 **Start state:** TASK-002 complete (USS parser exists).
 
-**End state:** `TokenStore` class. Loads token definitions from a
-`.uss` file containing only custom property declarations. Exposes
-`Resolve(string key) -> string value`. USS parser calls `Resolve`
-when it encounters a `var()`. Skin token overrides replace base
-token values without touching other tokens.
+**End state:** A token store that loads token definitions from a
+`.uss` file containing only custom property declarations. Resolves
+token keys to values. The USS parser resolves `var()` calls through
+the token store. Skin token overrides replace base token values
+without touching other tokens.
 
 **Definition of done:**
 - Base token file loads correctly
@@ -89,14 +88,14 @@ token values without touching other tokens.
 **What:** The cosave file format — header, block directory, typed
 data blocks — with read and write paths.
 
-**Start state:** Empty OHUI C++ project with CommonLib/SKSE scaffold.
-No other tasks required.
+**Start state:** Empty OHUI project with SKSE scaffold. No other
+tasks required.
 
-**End state:** `CosaveManager` that on game load reads an `.ohui` file
-alongside the Skyrim save (via SKSE's save game hooks), validates
-the header and block checksums, and exposes typed block accessors.
-On save writes the cosave atomically (temp file, validate, rename).
-Empty blocks for all defined block types are created on new game.
+**End state:** A cosave manager that on game load reads an `.ohui`
+file alongside the Skyrim save, validates the header and block
+checksums, and exposes typed block accessors. On save writes the
+cosave atomically. Empty blocks for all defined block types are
+created on new game.
 
 **Definition of done:**
 - Round-trip test: write a cosave, read it back, all values match
@@ -104,8 +103,8 @@ Empty blocks for all defined block types are created on new game.
 - Unknown blocks are skipped without error
 - Block version mismatch is logged as a warning, block is read
   with current parser (extra fields ignored)
-- Migration infrastructure present: `RegisterMigration(blockId,
-  fromVersion, toVersion, fn)` called before reads, chain applied
+- Migration infrastructure present: versioned migration chain applied
+  before reads
 
 **Reference:** `systems/cosave-persistence.md`
 
@@ -118,9 +117,9 @@ cosave Mod Data block.
 
 **Start state:** TASK-004 complete (cosave read/write works).
 
-**End state:** C++ `OHUI::Persist` namespace and Papyrus `OHUI_Persist`
-script. `SetBool/Int/Float/String`, `GetBool/Int/Float/String`,
-`Has`, `Delete`, `Clear`. Writes go to in-memory buffer. Buffer
+**End state:** A persistence API accessible from both native code and
+Papyrus. Typed get/set operations for bool, int, float, and string
+values. Has, delete, and clear operations. Writes buffered and
 flushed on cosave write. Namespace isolation enforced — mod A cannot
 read mod B's keys. Size limits enforced (64KB per entry, 1MB per mod).
 Violations logged, write rejected, no crash.
@@ -148,10 +147,9 @@ exposes the canvas to the compositor.
 
 **Start state:** TASK-001, TASK-002, TASK-003 complete.
 
-**End state:** `WidgetRegistry` that accepts widget manifests
-(`id`, `displayName`, `defaultPos`, `defaultSize`, `minSize`,
-`maxSize`, `defaultVisible`), stores them, and exposes the full
-canvas state as a list of `{id, pos, size, visible}` records.
+**End state:** A widget registry that accepts widget manifests
+(id, display name, default position, default size, min/max size,
+default visibility), stores them, and exposes the full canvas state.
 The three operations — Activate, Move, Resize — update the canvas
 state. No rendering. No data binding. Canvas management only.
 
@@ -173,11 +171,10 @@ state. No rendering. No data binding. Canvas management only.
 
 **End state:** Layout profiles (complete canvas snapshots) are written
 to the Layout Profiles cosave block on save and restored on load.
-`LayoutProfileManager` exposes: `SaveProfile(name)`, `LoadProfile(name)`,
-`ListProfiles()`, `DeleteProfile(name)`. Built-in profiles (Default,
-Minimal, Controller) are regenerated from compiled defaults when
-missing. Profile switching is instant — canvas state updated
-synchronously.
+Save, load, list, and delete operations for named profiles. Built-in
+profiles (Default, Minimal, Controller) are regenerated from compiled
+defaults when missing. Profile switching is instant — canvas state
+updated synchronously.
 
 **Definition of done:**
 - Save profile, reload game, load profile — positions/sizes/visibility
@@ -198,12 +195,11 @@ keys declared in the Skyrim data binding schema.
 **Start state:** TASK-010 complete (widget registry exists and has
 active widgets to bind to).
 
-**End state:** `DataBindingEngine` that polls a defined set of Skyrim
-game state values each frame (player health, stamina, magicka, level,
-shout cooldown — initial set from schema), compares to last known
-values, and notifies subscribed widgets of changed values. Reactive
-and frame-driven update modes both functional. Throttled reactive
-enforces declared rate.
+**End state:** A data binding engine that polls a defined set of
+Skyrim game state values (player health, stamina, magicka, level,
+shout cooldown — initial set from schema), detects changes, and
+notifies subscribed widgets. Reactive and frame-driven update modes
+both functional. Throttled reactive enforces declared rate.
 
 **Definition of done:**
 - Reactive widget: re-renders only when bound value changes, confirmed
@@ -256,12 +252,11 @@ context.
 
 **Start state:** SKSE input hook available. No other OHUI tasks required.
 
-**End state:** `InputContextStack` with `PushContext(id)`,
-`PopContext(id)`. Only the top context receives input events.
-Physical key/button events are routed to named action handlers in
-the active context. No two handlers in the same context fire for
-the same physical input simultaneously. Context not found on pop
-logs a warning.
+**End state:** An input context stack with push and pop operations.
+Only the top context receives input events. Physical key/button
+events are routed to named action handlers in the active context.
+No two handlers in the same context fire for the same physical
+input simultaneously. Context not found on pop logs a warning.
 
 **Definition of done:**
 - Push context A, push context B — only B's handlers fire
@@ -281,17 +276,17 @@ and the player rebinding store.
 
 **Start state:** TASK-020 complete.
 
-**End state:** `OHUI::Input::RegisterAction` accepts context ID,
-action ID, display name, default keyboard key, default controller
-button, handler. Default bindings applied on first run. Player
-rebinding stored per-character in cosave. Binding map applied at
-context push — no re-registration required on load.
+**End state:** Action registration accepts context ID, action ID,
+display name, default keyboard key, default controller button, and
+handler. Default bindings applied on first run. Player rebinding
+stored per-character in cosave. Binding map applied at context push
+— no re-registration required on load.
 
 **Definition of done:**
 - Register action, trigger default key — handler fires
 - Rebind to new key, trigger new key — handler fires
 - Trigger old key after rebind — handler does not fire
-- Papyrus `OHUI_Input.RegisterAction` functional
+- Papyrus action registration functional
 
 **Reference:** `systems/input-handling.md` § Action-Based Binding
 
@@ -305,7 +300,7 @@ for the active input device for a named action.
 **Start state:** TASK-021 complete (actions are registered and have
 bindings).
 
-**End state:** `ButtonPrompt` component that takes an action ID and
+**End state:** A button prompt component that takes an action ID and
 a label string. Renders the appropriate glyph (keyboard key, Xbox
 button, PlayStation button, Steam Deck button) for the active input
 device. Device switches instantly on input event from a different
@@ -331,17 +326,17 @@ Requires Phase 0 complete. Independent of Phases 1 and 2.
 **What:** The SkyUI MCM Papyrus API surface — `RegisterMCM`, `AddPage`,
 `OnConfigInit`, `OnConfigOpen`, `OnConfigClose`, `OnPageReset`.
 
-**Start state:** CommonLib/SKSE scaffold. TASK-004 (cosave) optional
-but desirable for state persistence.
+**Start state:** SKSE scaffold. TASK-004 (cosave) optional but
+desirable for state persistence.
 
-**End state:** Papyrus scripts can call `SKI_ConfigBase` registration
+**End state:** Papyrus scripts can call SkyUI's MCM registration
 functions and OHUI intercepts them, registers the mod in the MCM
-list, and stores page structure. `OnConfigInit` fires at the correct
-moment (kDataLoaded). Timing matches SkyUI exactly.
+list, and stores page structure. Registration callbacks fire at the
+correct moments. Timing matches SkyUI exactly.
 
 **Definition of done:**
 - A real SkyUI MCM mod (e.g. SkyUI itself) registers without error
-- `OnConfigInit` fires within the same frame as kDataLoaded
+- Registration callback fires at the correct moment during load
 - Page structure stored and retrievable from Registration State
   Inspector
 
@@ -368,6 +363,12 @@ and equivalent live-update functions work without `ForcePageReset`.
 - A mod with all 8 control types renders all controls correctly
 - Live update: `SetToggleOptionValue` updates rendered value without
   ForcePageReset
+
+Note on naming: SkyUI uses "Menu" (dropdown), "KeyMap" (keybind), and
+"Color" in its Papyrus API. OHUI's internal components use "Dropdown",
+"KeyBind", and "ColourPicker". Both names refer to the same controls.
+The compatibility shim maps SkyUI names to OHUI names transparently.
+MCM2 native API uses OHUI names exclusively.
 
 **Reference:** `systems/mcm2.md` § Control Types, § Callbacks,
 § Live Updates
@@ -433,7 +434,7 @@ into a typed MCM definition structure.
 
 **Start state:** TASK-030 (MCM registration infrastructure).
 
-**End state:** `MCM2Parser::Parse(path)` returns a typed `MCMDefinition`
+**End state:** A definition parser that returns a typed MCM definition
 containing pages, sections, controls with their types, defaults,
 descriptions, conditions, and callback names. Syntax errors are
 logged, parse is rejected, existing definition remains active.
@@ -482,8 +483,8 @@ via the cosave MCM Values block.
 
 **End state:** Control values from declarative MCMs are read from
 and written to the cosave MCM Values block automatically. No mod
-author persistence code required. `OHUI::MCM::GetBool/Float/String`
-return current values. Orphaned entries (mod uninstalled) retained
+author persistence code required. Typed get operations return current
+values. Orphaned entries (mod uninstalled) retained
 for N sessions then pruned.
 
 **Definition of done:**
@@ -538,7 +539,7 @@ barter, container, magic, and crafting screens.
 
 **Start state:** Phase 1 complete. Component library scaffold exists.
 
-**End state:** `FacetedList` component. SearchField always visible.
+**End state:** FacetedList component. SearchField always visible.
 PresetBar of named quick-filter combinations. FacetPanel (drawer on
 controller, sidebar on mouse) with multi-select facet groups.
 ActiveFilterChips below preset bar. Virtualised ScrollList — smooth
@@ -737,10 +738,10 @@ and cook trigger points.
 
 **Start state:** TASK-055 complete. TASK-004 complete.
 
-**End state:** `StampManager` writes a stamp to the cosave Stamped
+**End state:** A stamp manager writes a stamp to the cosave Stamped
 Items block at each crafting trigger. Stamp contains all fields
 defined in the schema. Item instance IDs generated at first stamp.
-Sentimental flag settable via API.
+Sentimental flag settable via the API.
 
 **Definition of done:**
 - Craft item — stamp present in cosave with correct skill level,
@@ -759,15 +760,14 @@ external mod-facing Papyrus/C++ API.
 
 **Start state:** TASK-070 complete.
 
-**End state:** `OHUI::Stamps::GetHistory`, `IsCrafted`,
-`IsSentimental`, `GetDedication` functional in C++. Papyrus
-`OHUI_Stamps` script functional. Inventory detail panel reads
-stamp history and renders it in the collapsible section.
+**End state:** Stamp read API functional from both native code and
+Papyrus — query history, crafted status, sentimental status, and
+dedication. Inventory detail panel reads stamp history and renders
+it in the collapsible section.
 
 **Definition of done:**
 - Crafted item — detail panel shows stamp history
-- Papyrus `OHUI_Stamps.IsCrafted` returns true for crafted item,
-  false for looted item
+- Stamp API correctly identifies crafted vs looted items
 - External mod reads dedication via API correctly
 
 ---
@@ -782,10 +782,10 @@ phases, but blocks release of any user-visible text.
 ### TASK-080 · String Definition and Resolution
 
 **Start state:** Phase 0 complete.
-**End state:** String definition format parsed. `LocalisationManager::
-Resolve(key, params[])` returns translated string for active language,
-falling back to definition default. Plural form selection correct
-for all CLDR rule sets covering Skyrim's 13 languages.
+**End state:** String definition format parsed. String resolution
+returns translated string for active language, falling back to
+definition default. Plural form selection correct for all CLDR rule
+sets covering Skyrim's 13 languages.
 **Definition of done:** English, Russian (complex plurals), and
 German strings resolve correctly. Missing key returns default, not
 raw key.
@@ -850,6 +850,16 @@ yet made or on prior phases being proven in production first.
 - `systems/message-log.md` — unified message log
 - `systems/mod-registration-api.md` — facet, widget, and HUD
   registration extension points
+- DSL parser/runtime — the engine that reads widget definition files
+  and drives rendering; architectural spine, needs a dedicated task
+- First-party HUD widgets — 12+ widgets (health/stamina/magicka bars,
+  compass, enemy health, sneak eye, shout meter, notification toast,
+  etc.) each need a build task once the DSL runtime exists
+- UIExtensions compatibility shim — fully specified in compatibility.md,
+  no implementation task written
+- Frozen giant native integrations — 9 mods, each needs a task
 - New Game+ flow — depends on cosave and multiple screen phases
 - DSL tooling — syntax highlighting, error reporting, validation
   toolchain for mod authors
+- Data binding schema implementation — `systems/data-binding-schema.md`
+  is now written; needs a corresponding TASK entry

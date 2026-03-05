@@ -146,31 +146,19 @@ The legacy summary is generated from stamp data, stats data, and quest
 completion records. It is a final look at what is being carried forward
 and what is being left behind before the new journey begins.
 
-### Why This Is Not Hard
+### Ownership Split
 
-New Game+ sounds like a large feature. It is not.
+OHUI owns the New Game+ configuration UI and the cosave data that
+records the player's carry-forward selections. A companion plugin
+handles the actual gameplay mutations — applying perk points, teaching
+spells, setting faction standings, marking map locations discovered,
+and placing heirloom items. OHUI presents the choices and persists
+them. The companion plugin executes them in the engine.
 
-There is no new game system to build. There is no mechanical complexity
-that does not already exist elsewhere in OHUI's infrastructure. The
-implementation is:
-
-1. A configuration screen at the New Game prompt — a selection UI
-2. A cosave read from the designated source save — SKSE already does this
-3. A set of data writes into the new game's starting state — the same
-   data OHUI writes for layout profiles, stamp data, and outfit persistence
-4. The new game starts
-
-OHUI already reads and writes cosave data. The stamp system already
-has item data APIs. Spells, perk points, faction reputation, and map
-discoveries are all readable from a save via SKSE. The hard part of
-New Game+ is the UI that makes the selection feel meaningful — and that
-is exactly what OHUI builds.
-
-The headlines write themselves. "Skyrim finally gets New Game+." Thirteen
-years in. First time anyone has done it properly at the UI level with
-a real selection screen and real mechanical meaning behind the choices.
-The implementation is a careful application of infrastructure that already
-exists for other purposes.
+This separation exists because the gameplay mutations involve engine-
+level operations that are outside the scope of a UI framework. OHUI
+does not reimpliment game mechanics. It provides the selection surface
+and the data layer. The companion plugin does the rest.
 
 ---
 
@@ -180,11 +168,11 @@ The main menu is otherwise deliberately thin.
 
 **Continue** — loads the most recent save. Nothing exotic.
 
-**Load Game** — the save browser. Sorted by date, searchable by
-character name, save thumbnails where available. Mod list delta
-indicator — if the save was made with a different mod list than the
-current one, the browser flags which mods are missing or added.
-Not a blocker. An honest warning before the player commits to loading.
+**Load Game** — the two-tier character gallery and save browser.
+See `screens/load-game.md` for the full specification. Players first
+select a character from a card gallery, then browse that character's
+save history with rich per-entry metadata. Mod list delta indicator
+flags saves made with a different mod list — honest warning, not a blocker.
 
 **Settings** — OHUI configuration, display, audio, controls, gameplay.
 Clean, organised, nothing buried.

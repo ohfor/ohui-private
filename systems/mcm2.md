@@ -30,161 +30,42 @@ SkyUI's version does or delegates to OHUI's equivalent system.
 
 ### Registration
 
-```papyrus
-; Mod registers itself as an MCM menu
-Function RegisterMCM()
-
-; Page structure
-Function AddPage(String asPageName)
-
-; Called by SKSE when the mod is loaded
-Event OnConfigInit()
-
-; Called when the MCM is opened for this mod
-Event OnConfigOpen()
-
-; Called when the MCM is closed for this mod  
-Event OnConfigClose()
-
-; Called when a page is displayed
-Event OnPageReset(String asPage)
-```
-
-OHUI's implementation: `RegisterMCM()` adds the mod to OHUI's settings
-registry. The mod's pages appear as sections in OHUI's settings screen
-under the mod's name. `OnConfigInit`, `OnConfigOpen`, `OnConfigClose`,
-and `OnPageReset` fire at the exact moments SkyUI fires them — on first
-load, on settings screen open, on settings screen close, and on page
-navigation respectively.
+OHUI implements SkyUI's full registration surface — `RegisterMCM`,
+`AddPage`, `OnConfigInit`, `OnConfigOpen`, `OnConfigClose`, and
+`OnPageReset`. The mod's pages appear as sections in OHUI's settings
+screen under the mod's name. All events fire at the exact moments
+SkyUI fires them — on first load, on settings screen open, on settings
+screen close, and on page navigation respectively.
 
 ### Control Registration Functions
 
-Every control registration function is implemented. The complete set:
-
-```papyrus
-; Boolean toggle
-int Function AddToggleOption(
-    String asText,
-    bool abValue,
-    String asDescription = "",
-    int aiFlags = 0
-)
-
-; Float slider with range
-int Function AddSliderOption(
-    String asText,
-    float afValue,
-    String asFormatString = "{0}",
-    String asDescription = "",
-    int aiFlags = 0
-)
-
-; Single-select dropdown
-int Function AddMenuOption(
-    String asText,
-    String asValue,
-    String asDescription = "",
-    int aiFlags = 0
-)
-
-; Read-only text display
-int Function AddTextOption(
-    String asText,
-    String asValue,
-    String asDescription = "",
-    int aiFlags = 0
-)
-
-; Colour picker
-int Function AddColorOption(
-    String asText,
-    int aiColor,
-    String asDescription = "",
-    int aiFlags = 0
-)
-
-; Keybind assignment
-int Function AddKeyMapOption(
-    String asText,
-    int aiKeyCode,
-    String asDescription = "",
-    int aiFlags = 0
-)
-
-; Section header / divider
-int Function AddHeaderOption(
-    String asText,
-    int aiFlags = 0
-)
-
-; Empty spacing element
-int Function AddEmptyOption()
-```
+Every control registration function is implemented: `AddToggleOption`,
+`AddSliderOption`, `AddMenuOption`, `AddTextOption`, `AddColorOption`,
+`AddKeyMapOption`, `AddHeaderOption`, and `AddEmptyOption`.
 
 Each function returns an option ID that the mod stores and uses in
-callbacks to identify which control was interacted with. OHUI's
-implementation returns stable IDs using the same generation logic
-as SkyUI — mods that store and compare option IDs across sessions
-get consistent results.
+callbacks to identify which control was interacted with. OHUI returns
+stable IDs using the same generation logic as SkyUI — mods that store
+and compare option IDs across sessions get consistent results.
 
 ### State Manipulation Functions
 
-```papyrus
-; Update a control's displayed value without reopening
-Function SetToggleOptionValue(int aiOption, bool abValue, ...)
-Function SetSliderOptionValue(int aiOption, float afValue, ...)
-Function SetMenuOptionValue(int aiOption, String asValue, ...)
-Function SetTextOptionValue(int aiOption, String asValue, ...)
-Function SetColorOptionValue(int aiOption, int aiColor, ...)
-Function SetKeyMapOptionValue(int aiOption, int aiKeyCode, ...)
+All state manipulation functions are implemented —
+`SetToggleOptionValue`, `SetSliderOptionValue`, `SetMenuOptionValue`,
+`SetTextOptionValue`, `SetColorOptionValue`, `SetKeyMapOptionValue`,
+`SetOptionFlags`, and `ForcePageReset`.
 
-; Enable or disable a control
-Function SetOptionFlags(int aiOption, int aiFlags, ...)
-
-; Force a full page refresh
-Function ForcePageReset()
-```
-
-All implemented. `SetToggleOptionValue` and friends update the rendered
-control in OHUI's settings screen in real time without requiring a page
-reload. OHUI's component layer handles the live update — the Toggle,
-Slider, Dropdown, and other components accept value updates at any time.
+These update the rendered control in OHUI's settings screen in real
+time without requiring a page reload. OHUI's component layer handles
+the live update — the Toggle, Slider, Dropdown, and other components
+accept value updates at any time.
 
 ### Callbacks
 
-Every callback is fired. The complete set:
-
-```papyrus
-; A toggle was clicked
-Event OnOptionSelect(int aiOption)
-
-; A control was reset to default
-Event OnOptionDefault(int aiOption)
-
-; Cursor moved to a control (description display)
-Event OnOptionHighlight(int aiOption)
-
-; Slider opened (mod provides min/max/step/default)
-Event OnOptionSliderOpen(int aiOption)
-
-; Slider value accepted
-Event OnOptionSliderAccept(int aiOption, float afValue)
-
-; Menu opened (mod provides options list)
-Event OnOptionMenuOpen(int aiOption)
-
-; Menu option accepted
-Event OnOptionMenuAccept(int aiOption, int aiIndex)
-
-; Colour picker opened
-Event OnOptionColorOpen(int aiOption)
-
-; Colour value accepted
-Event OnOptionColorAccept(int aiOption, int aiColor)
-
-; Keybind changed
-Event OnOptionKeyMapChange(int aiOption, int aiKeyCode, ...)
-```
+Every callback is fired: `OnOptionSelect`, `OnOptionDefault`,
+`OnOptionHighlight`, `OnOptionSliderOpen`, `OnOptionSliderAccept`,
+`OnOptionMenuOpen`, `OnOptionMenuAccept`, `OnOptionColorOpen`,
+`OnOptionColorAccept`, and `OnOptionKeyMapChange`.
 
 **Timing guarantee:** Every callback fires within the same frame as
 the player action that triggered it. No deferred firing. No queued
@@ -197,26 +78,13 @@ synchronous callback execution work correctly.
 SkyUI uses a two-step pattern for sliders and menus — the mod registers
 the control with a current value, then provides the range/options data
 in a callback when the control is opened. OHUI implements the same
-pattern:
+pattern. All slider dialog and menu dialog data functions are
+implemented.
 
-```papyrus
-; Fired when slider is opened — mod calls these to provide range data
-Function SetSliderDialogStartValue(float afValue)
-Function SetSliderDialogDefaultValue(float afValue)
-Function SetSliderDialogRange(float afMin, float afMax)
-Function SetSliderDialogInterval(float afInterval)
-
-; Fired when menu is opened — mod calls these to provide options
-Function SetMenuDialogStartIndex(int aiIndex)
-Function SetMenuDialogDefaultIndex(int aiIndex)
-Function SetMenuDialogOptions(String[] asOptions)
-```
-
-OHUI calls `OnOptionSliderOpen` when the player activates a slider.
-The mod calls `SetSliderDialogRange` etc. in its handler. OHUI reads
-those values and opens its Slider component with the correct range.
-The mod never knows it is talking to a Slider component — it is
-talking to the same function signatures it always has.
+OHUI calls the appropriate open callback when the player activates a
+slider or menu. The mod provides range/options data in its handler.
+OHUI reads those values and opens the correct component. The mod never
+knows OHUI is underneath — it is talking to the same API it always has.
 
 ---
 
@@ -290,14 +158,6 @@ ColourPicker and KeyBind are added to the component library as a result
 of MCM2's requirements. Both are independently reusable — ColourPicker
 for any colour selection surface, KeyBind for OHUI's own settings
 controls as well as mod-registered controls.
-
-```
-ColourPicker(value: hex, onChange)
-// Opens Modal with HSL picker, hex input, preview swatch
-
-KeyBind(keyCode, onChange, allowController: bool)
-// Displays current binding, enter capture mode on activate
-```
 
 Component count increases from 59 to 61.
 
@@ -491,42 +351,11 @@ to display the MCM.
 ### Callback Registration
 
 Callbacks are registered separately — in a C++ plugin or a Papyrus
-script — by the names referenced in the definition:
-
-```cpp
-// C++ callback registration
-OHUI::MCM::RegisterCallback(
-    "com.mymod.settings",
-    "OnFeatureToggled",
-    [](bool newValue) {
-        // handle toggle change
-    }
-);
-
-OHUI::MCM::RegisterCallback(
-    "com.mymod.settings",
-    "OnStrengthChanged",
-    [](float newValue) {
-        // handle slider change
-    }
-);
-```
-
-```papyrus
-; Papyrus callback registration
-OHUI_MCM.RegisterCallback(
-    mcmId = "com.mymod.settings",
-    callbackName = "OnFeatureToggled",
-    handler = self,
-    functionName = "HandleFeatureToggled"
-)
-```
-
-The definition references callbacks by name. The callbacks are
-implemented wherever makes sense for the mod — C++ for native plugins,
-Papyrus for script-based mods. OHUI resolves the reference at
-interaction time. The definition does not need to know where the
-callback lives.
+script — by the names referenced in the definition. The definition
+references callbacks by name. The callbacks are implemented wherever
+makes sense for the mod — C++ for native plugins, Papyrus for script-
+based mods. OHUI resolves the reference at interaction time. The
+definition does not need to know where the callback lives.
 
 ### Conditions
 
@@ -563,16 +392,10 @@ OHUI. The mod author does not write persistence code. OHUI stores
 current values in the cosave keyed by `mcmId + controlId`. Values
 are restored on load. Defaults are applied on first run.
 
-The mod author reads current values via a simple API:
-
-```cpp
-bool enabled = OHUI::MCM::GetBool("com.mymod.settings", "enableFeature");
-float strength = OHUI::MCM::GetFloat("com.mymod.settings", "featureStrength");
-std::string mode = OHUI::MCM::GetString("com.mymod.settings", "featureMode");
-```
-
-No SkSE storage. No JSON config files. No Papyrus properties. OHUI
-owns the persistence and the mod reads from it. One source of truth.
+The mod author reads current values via a simple typed API — get bool,
+float, or string by MCM ID and control ID. No separate storage. No
+JSON config files. No Papyrus properties. OHUI owns the persistence
+and the mod reads from it. One source of truth.
 
 ### Hot Reload
 

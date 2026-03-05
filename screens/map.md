@@ -182,95 +182,31 @@ navigate between them without returning to the map.
 
 ---
 
-## Live Location Preview
+## Live Location Preview (Exploratory)
 
-Any map marker can be previewed as a live render before fast travelling or navigating
-to it. Selecting a marker on the map surfaces a viewport showing the actual location
-as it exists in the current load order — geometry, textures, lighting, weather, all
-mod-applied visuals included. What the player sees in the preview is exactly what
-they will arrive at.
+Street View for Skyrim — select any map marker, see the actual location as it
+exists in the current load order before you go there. The ambition is right and
+the design intent is clear.
 
-This is Street View for Skyrim. It has never existed before.
+This is exploratory. It is not a launch commitment and will not be specced in
+detail until the implementation path is understood.
 
-### Technical Approach
+**The core problem is cell loading.** A distant location is not in memory when
+the player is looking at it on the map. Loading it in the background for a preview
+viewport, without affecting game performance or stability, is an open engineering
+question. Interior cells compound this — each dungeon or building is a separate
+cell that must be loaded to render. Whether this can be done lightly enough (geometry
+and lighting only, no AI or physics simulation) to be practical is unknown without
+a prototype.
 
-The engine already supports free camera positioning and rendering into viewports.
-Photomode mods do this. Kill cams do this. Scripted sequences do this. OHUI applies
-the same capability to the map screen — positioning a camera at or near the selected
-marker's world coordinates and rendering what it sees into a native C++ viewport.
+This is a different problem from the actor viewport system. The actor viewport
+renders actors that are already loaded. Live location preview must load something
+that is not currently in memory. These are not the same mechanism.
 
-The same viewport mechanism used for NPC portraits in the dialogue screen. Same
-pattern. Different camera position. The technical foundation is established.
-
-**Camera placement** — the preview camera is positioned at the marker's world
-coordinates, slightly elevated, oriented toward the location's primary approach
-angle or centre of mass. For dungeons, the camera faces the entrance. For cities,
-it faces the main gate. For wilderness locations, it faces the most visually
-characteristic view. Default placement is automatic. The player can override it.
-
-**Camera control** — the player can rotate the preview camera freely using the
-right stick or mouse drag. A full 360 degree look-around from the camera's position.
-Not a fixed screenshot — an explorable view. This is the feature. The player
-looks around the location from the map screen before they go there.
-
-**Zoom** — the player can push the camera forward and back along its view axis.
-Combined with rotation this gives meaningful spatial understanding of the location
-before arrival.
-
-**Live rendering** — the preview reflects the current load order exactly. A
-location retextured by a mod looks retextured in the preview. A location affected
-by a lighting overhaul looks lit accordingly. Weather at the location at the
-current game time is rendered. The preview is not a static image — it is the
-actual world.
-
-### Cell Loading
-
-The primary technical constraint is cell loading. A distant exterior location may
-not be loaded in memory when the player is looking at it on the map. OHUI handles
-this by requesting a cell load for the preview on marker selection — a background
-operation that surfaces a loading indicator in the preview viewport until the cell
-is ready. The player sees the marker selected, sees a brief loading state, then
-sees the live preview.
-
-Interior locations (dungeons, caves, buildings) require their interior cell to be
-loaded. Same approach — background load on selection, loading indicator, live
-preview when ready.
-
-Cell loading for preview purposes is lightweight compared to a full game transition.
-The preview does not require NPC simulation, AI, or full physics — geometry and
-lighting only. The performance cost is bounded and does not affect gameplay.
-
-The loading state is not a flaw to be minimised — it is anticipation. The player
-selects a marker, the preview panel opens with a brief loading indicator, and then
-the world appears. That moment of reveal may feel better than instant. Google Street
-View pre-captures everything precisely because they cannot do what this feature does
-— render the actual current world in real time. A photograph from three years ago
-loads instantly. The living world takes a moment. That is an acceptable trade and
-possibly a feature in its own right.
-
-### Preview Panel
-
-The preview is surfaced as a panel within the map screen — not full screen, not
-a separate screen. The map remains visible. The player can see where the location
-is on the map while previewing what it looks like.
-
-Panel size is configurable. Default is a quarter of the map screen. Can be expanded
-to half screen for a more immersive preview. Collapsed by default — the player
-opens it intentionally.
-
-The preview panel can be detached and repositioned within the map screen using
-the same edit mode mechanics as the rest of OHUI. A player who always wants the
-preview in a specific position sets it once.
-
-### Mod Location Support
-
-Mod-added locations participate in live preview automatically if they register
-map markers through standard Skyrim marker registration. The camera is positioned
-at the marker's world coordinates regardless of which mod placed the marker. A
-mod-added dungeon entrance previews exactly like a vanilla one.
-
-This extends the value of live preview beyond vanilla content to the entire mod
-ecosystem without any author work required.
+The feature will be designed and prototyped when it makes sense to do so. If
+it proves viable it is one of the more novel things OHUI can offer. If it proves
+too costly or unstable it will not ship. The decision requires evidence that
+does not yet exist.
 
 ---
 

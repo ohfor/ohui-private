@@ -227,8 +227,7 @@ and ships none.
 
 ## Native Notification System
 
-Skyrim's native notification function (`Debug.Notification` in Papyrus,
-`REL::Relocation` equivalent in SKSE plugins) is intercepted and published into
+Skyrim's native notification function is intercepted and published into
 OHUI's message log stream as a `notification` typed message. Existing mods that
 call the native notification function get their messages surfaced through OHUI's
 HUD message widget automatically — correctly typed, attributed to the calling mod
@@ -310,10 +309,14 @@ addition is an obligation that does not expire.
 - **Legacy of the Dragonborn (LOTD)** — affects the map screen (LOTD map
   markers), custom skill trees (LOTD progression systems), quest journal
   (LOTD quest volume), and the Tween Menu (LOTD screens as destinations).
-  One of the most installed content mods in the ecosystem. Actively developed
-  but too important to leave to a registration API alone — native support
-  ensures day one compatibility regardless of whether the LOTD team engages
-  with OHUI's APIs.
+  One of the most installed content mods in the ecosystem. LOTD is actively
+  developed — it does not meet the "frozen" criterion — but its install base
+  and surface area are too large to leave to a registration API at launch.
+  Native support ensures day one compatibility. If the LOTD team engages with
+  OHUI's registration APIs, native support transitions to author-maintained
+  integration and OHUI's baked-in knowledge is retired. LOTD is the one
+  exception to the frozen giants criteria and is listed here explicitly for
+  that reason.
 
 **Economy**
 - **General Stores** — merchant and economy framework. Native support warranted

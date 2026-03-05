@@ -247,6 +247,7 @@ OHUI is independent infrastructure. Both projects benefit directly:
 - `systems/hud-widget-runtime.md` — widget canvas, edit mode, widget contract.
 - `systems/component-library.md` — full component and token library.
 - `systems/dsl-and-skinning.md` — DSL, USS/Yoga, rendering paths, skin system.
+- `systems/data-binding-schema.md` — named binding catalogue, poll sources, custom bindings.
 - `systems/input-handling.md` — context stack, action binding, button prompts.
 - `systems/localisation.md` — string format, pluralisation, RTL, font system.
 - `systems/performance-model.md` — update modes, dirty flagging.

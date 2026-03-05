@@ -227,36 +227,15 @@ Mod authors who want richer messages opt into the OHUI API.
 
 ## Mod Author API
 
-```
-MessageLog.Post({
-    content: "Your flask charges have regenerated.",
-    type: "notification",
-    source: "True Flasks NG",
-    priority: "normal",
-    lifetime: 4.0
-})
-```
+Mod authors can post messages to the stream with content, type, source
+attribution, priority, and lifetime hint. Messages posted via the API
+are indistinguishable from first-party messages in the log.
 
-Custom types are declared once and then used freely:
-
-```
-MessageLog.RegisterType({
-    id: "trueflasks",
-    label: "Flask Events",
-    defaultVisible: true,
-    defaultLifetime: 3.0,
-    colour: "#88CCFF"
-})
-
-MessageLog.Post({
-    content: "Health flask fully charged.",
-    type: "trueflasks",
-    priority: "low"
-})
-```
-
-Custom types appear as tabs in the message log panel. Players can filter them in
-the HUD widget. They are first-class participants in the stream.
+Custom types can be registered with an ID, display label, default
+visibility, default lifetime, and colour. Once registered, a custom
+type appears as a tab in the message log panel. Players can filter
+custom types in the HUD widget. They are first-class participants in
+the stream.
 
 ---
 
