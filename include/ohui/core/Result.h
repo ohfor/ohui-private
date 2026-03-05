@@ -21,6 +21,8 @@ enum class ErrorCode {
     EditModeNotActive,
     InvalidNamespace,
     ContextNotFound,
+    ActionNotFound,
+    BindingConflict,
 };
 
 struct Error {

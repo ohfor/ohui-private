@@ -86,6 +86,8 @@ set(CORE_SOURCES
     src/widget/EditSession.cpp
     src/binding/BindingSchema.cpp
     src/input/InputContextStack.cpp
+    src/input/ActionRegistry.cpp
+    src/input/RebindingStore.cpp
     # Each task appends here
 )
 
@@ -119,6 +121,8 @@ set(CORE_HEADERS
     include/ohui/input/InputTypes.h
     include/ohui/input/InputContext.h
     include/ohui/input/InputContextStack.h
+    include/ohui/input/ActionRegistry.h
+    include/ohui/input/RebindingStore.h
     # Each task appends here
 )
 
