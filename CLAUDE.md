@@ -23,8 +23,11 @@ A separate public repository receives a **filtered subset** of this repo (source
 **Use `deploy.ps1` for all builds.** Never run cmake commands directly.
 
 ```powershell
-# Build + deploy DLL
+# Build + deploy DLL (runs tests before deploy)
 .\scripts\deploy.ps1
+
+# Build + deploy DLL, skip test gate
+.\scripts\deploy.ps1 -SkipTests
 
 # Build + deploy DLL + compile all Papyrus
 .\scripts\deploy.ps1 -Papyrus
@@ -40,13 +43,27 @@ cmake --preset release
 
 **NEVER reconfigure or rebuild VCPKG** unless there is a specific, confirmed reason (e.g., new dependency added to `vcpkg.json`, corrupted build cache). A full VCPKG rebuild takes 15+ minutes. If a build fails, the cause is almost always a quoting error, missing file, or code error — not a stale VCPKG cache.
 
+## Build Targets
+
+| Target | Type | PCH | Purpose |
+|--------|------|-----|---------|
+| `ohui_core` | Static library | `CorePCH.h` | All logic, no game engine. Tests link against this. |
+| `OHUI` | Shared library (DLL) | `PCH.h` | Ships to users. Entry point + bridge code. |
+| `ohui_tests` | Executable | Reuses `ohui_core` | Unit and contract tests (Catch2). |
+
+`ohui_compile_options` is an INTERFACE library sharing MSVC flags across all targets.
+
+New source files must be added to the explicit `CORE_SOURCES`/`CORE_HEADERS` manifests in `CMakeLists.txt` (not globbed). DLL-only files go in `DLL_SOURCES`. Test files go in `tests/CMakeLists.txt` `TEST_SOURCES`.
+
 ## Build Checklist (MANDATORY)
 
 After code changes, ALWAYS complete the full cycle:
 
-1. **C++ changes** -> `.\scripts\deploy.ps1` -> verify DLL timestamp
+1. **C++ changes** -> `.\scripts\deploy.ps1` -> verify tests pass + DLL timestamp
 2. **Papyrus changes** -> `.\scripts\deploy.ps1 -PapyrusOnly` -> verify .pex timestamps updated
 3. **Both** -> `.\scripts\deploy.ps1 -Papyrus` (C++ first, then Papyrus)
+
+The deploy script runs `ctest` automatically before deploying. If tests fail, deploy is blocked. Use `-SkipTests` only when intentionally bypassing.
 
 NEVER assume previous session left things deployed. ALWAYS verify timestamps before asking user to test.
 
@@ -98,20 +115,33 @@ Version bumps happen ONLY when preparing a Nexus release, not after every featur
 | File | Purpose |
 |------|---------|
 | `src/main.cpp` | Plugin entry point, logging, message handling |
+| `src/core/GameBridge.cpp` | Concrete SKSE implementations of ohui interfaces (DLL-only) |
 | `include/Version.h` | Version constants |
-| `include/PCH.h` | Precompiled header |
-| `scripts/deploy.ps1` | Build + deploy (DLL and/or Papyrus) |
+| `include/PCH.h` | Precompiled header (DLL target — includes CommonLibSSE) |
+| `include/CorePCH.h` | Precompiled header (ohui_core — standard lib + spdlog, no CommonLibSSE) |
+| `include/ohui/core/Result.h` | `ohui::Result<T>`, `ohui::Error`, `ohui::ErrorCode` |
+| `include/ohui/core/Log.h` | `ohui::log::debug()` / `trace()` wrapper for core code |
+| `include/ohui/core/IFileSystem.h` | Narrow file I/O interface for testability |
+| `scripts/deploy.ps1` | Build + test + deploy (DLL and/or Papyrus) |
 | `scripts/build_package.ps1` | Release packaging for Nexus |
 | `scripts/check_versions.py` | Version consistency across 4 files |
+| `docs/Architecture.md` | Layer model, module map, build targets, data flow |
 | `DESIGN.md` | Architectural vision and layer model |
 | `TASKS.md` | Complete task breakdown (68 tasks, 15 phases) |
+| `.private/reference-overrides/ohui-conventions.md` | Error handling, naming, logging, memory ownership conventions |
 
 ## Directory Structure
 
 | Directory | Contents |
 |-----------|----------|
-| `src/` | C++ source files |
+| `src/` | C++ source files (mirrors `include/ohui/` module structure) |
+| `src/core/` | Logging, game bridge (DLL-only) |
+| `src/cosave/` | Cosave manager, persistence API |
+| `src/dsl/` | USS parser, token store |
+| `src/layout/` | Yoga layout wrapper |
 | `include/` | C++ header files |
+| `include/ohui/` | Module headers: `core/`, `cosave/`, `dsl/`, `layout/` |
+| `tests/` | Catch2 test sources, mocks, fixtures |
 | `scripts/` | Build, deploy, and utility scripts |
 | `docs/` | Public documentation (Build, Architecture, Changelog) |
 | `dist/` | Nexus archive layout (game data files shipped to users) |
@@ -200,7 +230,7 @@ These portable guides live in `.private/reference/` and cover patterns learned f
 | Doc | Covers |
 |-----|--------|
 | `docs/Build.md` | Prerequisites, VCPKG, configure, build, deploy |
-| `docs/Architecture.md` | Plugin design, hooks, data structures |
+| `docs/Architecture.md` | Layer model, module map, build targets, dependency graph |
 | `docs/CHANGELOG.md` | Version history |
 
 ## What NOT To Try
