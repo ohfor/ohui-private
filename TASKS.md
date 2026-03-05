@@ -239,6 +239,33 @@ layout auto-saved to active profile. Chrome removed. Game resumes.
 
 ---
 
+### TASK-014 · Data Binding Schema Implementation
+
+**What:** Implement the full Skyrim data binding schema — all binding
+IDs defined in `systems/data-binding-schema.md` — with their poll
+sources, types, and poll rates.
+
+**Start state:** TASK-012 complete (data binding engine exists).
+
+**End state:** All built-in bindings from the schema are registered
+and polling live game state via SKSE. Player vitals, stats, skills,
+state, location, equipped items, enemy target, time, and world
+bindings all functional. Poll rates per the schema table.
+
+**Definition of done:**
+- `player.health.current` updates in real time during combat
+- `player.level` updates on level-up event
+- `enemy.name` returns target name when crosshair is on an NPC,
+  returns empty string when no target
+- `time.hour` tracks game time correctly
+- All 18 skill bindings return correct values
+- Custom binding registration API functional: a test mod registers
+  a custom binding and a test widget reads it
+
+**Reference:** `systems/data-binding-schema.md`
+
+---
+
 ## Phase 2 — Input System
 
 Requires TASK-010 (widget registry) to exist.
@@ -315,9 +342,118 @@ device type. All visible prompts update.
 
 ---
 
-## Phase 3 — MCM Compatibility Layer
+## Phase 3 — DSL Runtime
 
-Requires Phase 0 complete. Independent of Phases 1 and 2.
+Requires Phase 0 (TASK-001–003) and TASK-012 (data binding engine).
+This is the architectural spine — blocks all DSL-defined widgets,
+all first-party HUD widgets, and all skin authoring.
+
+---
+
+### TASK-025 · DSL Parser
+
+**What:** Parse `.widget` definition files into a typed AST. The DSL
+syntax defined in `systems/dsl-and-skinning.md`.
+
+**Start state:** TASK-002 (USS parser) complete.
+
+**End state:** A parser that reads widget definition files and
+produces a typed AST containing: widget name, requires clause,
+property declarations with types, component tree with classes and
+property bindings, animate blocks, skin definitions with token
+overrides and optional ControlTemplate.
+
+**Definition of done:**
+- Parses the HealthBar example from dsl-and-skinning.md correctly
+- Parses a skin definition with token overrides only
+- Parses a skin definition with full ControlTemplate
+- Parses `requires ohui >= 1.3` version constraint
+- Syntax error produces clear error with file/line/column
+- Unknown component types logged as warning, parse continues
+
+**Reference:** `systems/dsl-and-skinning.md` § The DSL
+
+---
+
+### TASK-026 · DSL Runtime Engine
+
+**What:** The runtime that evaluates a parsed widget AST, resolves
+data bindings, runs Yoga layout, and produces draw calls.
+
+**Start state:** TASK-025, TASK-001 (Yoga), TASK-003 (tokens),
+TASK-012 (data binding engine) complete.
+
+**End state:** Given a widget AST and a set of data binding values,
+the runtime: resolves `bind()` references against the data binding
+engine, resolves `token()` references against the token store,
+builds a Yoga layout tree from the component structure, runs layout,
+and emits a draw call list (rectangles, text, icons with computed
+positions and styles). The draw calls are renderer-agnostic.
+
+**Definition of done:**
+- HealthBar widget with bound values renders correct draw calls
+- Token override (skin) changes draw call colours without re-parse
+- Animate block produces interpolated values over declared duration
+- Widget with no bound values renders static content correctly
+- Layout recalculates when widget is resized
+
+**Reference:** `systems/dsl-and-skinning.md` § Rendering Paths
+
+---
+
+### TASK-027 · Renderer Bridge (Scaleform)
+
+**What:** The default rendering backend that consumes DSL runtime
+draw calls and paints them via Scaleform.
+
+**Start state:** TASK-026 complete.
+
+**End state:** The Scaleform renderer accepts draw call lists from
+the DSL runtime and renders them into the game's UI layer.
+Rectangles, text, icons, images, and 9-slice borders all render
+correctly. The renderer abstraction layer interface is defined —
+any alternative renderer implements this same interface.
+
+**Definition of done:**
+- A DSL-defined widget is visible on screen in-game
+- Text renders with correct font, size, and colour
+- Rectangles render with correct fill, border, and radius
+- Icon atlas lookup and tinting functional
+- Skin swap (token override) updates visuals without restart
+
+**Reference:** `systems/dsl-and-skinning.md` § Renderer Abstraction Layer
+
+---
+
+### TASK-028 · Viewport Contract
+
+**What:** The viewport interface that native C++ widgets and third-party
+renderers implement to participate in the widget system.
+
+**Start state:** TASK-010 (widget registry), TASK-027 (renderer bridge)
+complete.
+
+**End state:** A viewport contract interface: given a rectangle
+(position + size), render into it. Native widgets implement this
+interface and register with the widget registry. They receive edit
+mode notifications, layout profile persistence, and canvas management
+identically to DSL-defined widgets. Only the pixels inside the
+viewport differ.
+
+**Definition of done:**
+- A test native widget renders custom content into a viewport
+- The native widget participates in edit mode (drag, resize)
+- Layout profile saves and restores the native widget's position
+- The native widget receives show/hide notifications
+
+**Reference:** `systems/hud-widget-runtime.md` § Non-Scaleform Overlays,
+`systems/dsl-and-skinning.md` § Rendering Paths
+
+---
+
+## Phase 4 — MCM Compatibility Layer
+
+Requires Phase 0 complete. Independent of Phases 1–3.
 
 ---
 
@@ -349,10 +485,12 @@ correct moments. Timing matches SkyUI exactly.
 **What:** OHUI renders an MCM screen from SkyUI-registered control
 definitions. All 8 control types functional.
 
-**Start state:** TASK-030 complete.
+**Start state:** TASK-030 complete. Requires component library
+primitives (Toggle, Slider, Dropdown, TextInput) — either from
+TASK-050A or built inline as MCM-specific controls.
 
-**End state:** When a player opens an MCM, OHUI renders it using the
-OHUI component library. All 8 control types functional: Toggle,
+**End state:** When a player opens an MCM, OHUI renders it using
+OHUI components. All 8 control types functional: Toggle,
 Slider, Menu, Text, Color, KeyMap, Header, Empty. Player interactions
 fire the correct 11 callbacks with correct timing. `SetToggleOptionValue`
 and equivalent live-update functions work without `ForcePageReset`.
@@ -421,9 +559,9 @@ surfaced as filterable channel in the message log.
 
 ---
 
-## Phase 4 — MCM2 Native API
+## Phase 5 — MCM2 Native API
 
-Requires Phase 3 complete.
+Requires Phase 4 complete.
 
 ---
 
@@ -467,7 +605,7 @@ condition sources (e.g. `player.skill.smithing >= 50`).
 **Definition of done:**
 - Toggle A controls visibility of Slider B — toggling A immediately
   shows/hides B without any explicit refresh call
-- Custom state provider registered and queryed correctly
+- Custom state provider registered and queried correctly
 - Circular condition references detected and logged, not executed
 
 **Reference:** `systems/mcm2.md` § Conditions
@@ -523,29 +661,67 @@ mcm id change) detected, logged, flagged in Inspector. No restart.
 
 ---
 
-## Phase 5 — Screens
+## Phase 6 — Component Library
 
-Each screen is an independent task. All require Phase 1 (widget
-runtime) and Phase 2 (input) complete. Screens that share the
-FacetedList component should implement it once in the component
-library first (see TASK-050).
+Requires Phase 3 (DSL runtime) and Phase 2 (input) complete.
+Components are the building blocks for all screens.
 
 ---
 
-### TASK-050 · FacetedList Component
+### TASK-050A · Atom Layer and Token Implementation
 
-**What:** The shared filtered list component used by inventory,
-barter, container, magic, and crafting screens.
+**What:** Implement the atom layer (Text, Rectangle, Line, Icon,
+Image, Viewport primitives) and the full token set (colour, spacing,
+typography, shape) as defined in `systems/component-library.md`.
 
-**Start state:** Phase 1 complete. Component library scaffold exists.
+**Start state:** TASK-027 (renderer bridge) complete.
 
-**End state:** FacetedList component. SearchField always visible.
-PresetBar of named quick-filter combinations. FacetPanel (drawer on
-controller, sidebar on mouse) with multi-select facet groups.
-ActiveFilterChips below preset bar. Virtualised ScrollList — smooth
-scroll at any list size. Facets registered at construction by the
-host screen. External facet registration via mod API. Filter state
-is additive — player starts with everything and narrows.
+**End state:** All 6 atom types render correctly via the renderer
+bridge. All token categories loaded from USS and resolvable. Skin
+token overrides change atom rendering. The token set from
+component-library.md is the shipped default.
+
+**Definition of done:**
+- Text atom renders with correct font stack, size, weight, colour
+- Rectangle atom renders filled, outlined, and rounded variants
+- Icon atom renders from atlas with tint
+- Image atom renders with fit/fill/stretch modes
+- Token override changes all consuming atoms on next render
+
+**Reference:** `systems/component-library.md` § Token Layer, § Atom Layer
+
+---
+
+### TASK-050B · Text and Value Components
+
+**What:** Label, Caption, RichText, LoreText, StatValue, StatDelta,
+DeltaList, ValueBar, TimerBar, CountBadge.
+
+**Start state:** TASK-050A complete.
+
+**End state:** All 10 components render correctly, consume tokens,
+and are composable within widget definitions.
+
+**Definition of done:**
+- StatDelta renders colour-coded positive/negative deltas
+- ValueBar animates fill on value change
+- TimerBar shifts colour at registered thresholds
+- RichText renders inline bold, italic, colour spans
+
+**Reference:** `systems/component-library.md` § Text Components,
+§ Value Display Components
+
+---
+
+### TASK-050C · List Components
+
+**What:** ListEntry, ListEntryCompact, ScrollList, FacetedList.
+
+**Start state:** TASK-050B complete.
+
+**End state:** FacetedList fully functional — SearchField, PresetBar,
+FacetPanel (drawer on controller, sidebar on mouse), ActiveFilterChips,
+virtualised ScrollList. External facet registration via mod API.
 
 **Definition of done:**
 - 1000-item list scrolls smoothly at 60fps
@@ -554,14 +730,132 @@ is additive — player starts with everything and narrows.
   facet, tapping chip removes that facet
 - External facet registered by a test mod appears in FacetPanel
 
-**Reference:** `systems/component-library.md` § FacetedList,
-`screens/inventory-barter-container.md`
+**Reference:** `systems/component-library.md` § List Components
+
+---
+
+### TASK-050D · Navigation and Input Components
+
+**What:** TabBar, Breadcrumb, Pagination, TextInput, SearchField,
+Toggle, Slider, Dropdown, Stepper, ContextMenu.
+
+**Start state:** TASK-050A complete.
+
+**End state:** All navigation and input components functional with
+keyboard, mouse, and controller. Full OSK support on TextInput.
+
+**Definition of done:**
+- TextInput: type text, clear, OSK triggers on controller focus
+- Dropdown: open, scroll, select, keyboard search
+- ContextMenu: trigger from list entry, navigate, select, dismiss
+- Stepper: increment, decrement, min/max constraints honoured
+
+**Reference:** `systems/component-library.md` § Navigation Components,
+§ Input Components
+
+---
+
+### TASK-050E · Container and Layout Components
+
+**What:** Panel, SplitPanel, ScrollPanel, Modal, Tooltip, Drawer.
+
+**Start state:** TASK-050A complete.
+
+**End state:** All layout containers render correctly. Modal traps
+focus and dims backdrop. Tooltip repositions at screen edges. Drawer
+slides in/out with animation.
+
+**Definition of done:**
+- Modal: opens, traps focus, dismisses on backdrop click and cancel
+- Tooltip: appears on hover, repositions when near screen edge
+- SplitPanel: draggable divider adjusts ratio
+- Drawer: slides in from edge, slides out on dismiss
+
+**Reference:** `systems/component-library.md` § Container Components
+
+---
+
+### TASK-050F · Indicator and Media Components
+
+**What:** StatusBadge, IndicatorDot, ProvenanceStamp, AlertBanner,
+CompletionRing, Portrait, CharacterViewport, SceneViewport, MapViewport.
+
+**Start state:** TASK-050A complete. TASK-028 (viewport contract) for
+media viewport components.
+
+**End state:** All indicator components render with correct tokens.
+Media viewport components render into viewport contract surfaces.
+CharacterViewport supports rotate/zoom/pan input.
+
+**Definition of done:**
+- ProvenanceStamp renders complete stamp history collapsible
+- AlertBanner renders dismissable warning with icon
+- CharacterViewport renders player character with camera control
+- Portrait renders NPC bust with fixed framing
+
+**Reference:** `systems/component-library.md` § Indicator Components,
+§ Media Components
+
+---
+
+### TASK-050G · Edit Mode Components
+
+**What:** WidgetBoundingBox, AlignmentGuide, EditModeToolbar,
+GridOverlay.
+
+**Start state:** TASK-013 (edit mode runtime) complete, TASK-050A
+complete.
+
+**End state:** Edit mode visuals rendered via the component library.
+Replaces any placeholder visuals from TASK-013. Alignment guides
+appear on widget proximity. Grid overlay toggleable.
+
+**Definition of done:**
+- Bounding box shows resize handles and widget label
+- Alignment guides appear when dragging near another widget edge
+- Toolbar shows coordinates and grid snap toggle
+- Grid overlay matches snap increment, toggles on/off
+
+**Reference:** `systems/component-library.md` § Edit Mode Components
+
+---
+
+### TASK-050H · HUD-Specific Components
+
+**What:** ResourceBar, ShoutMeter, CompassRose, DetectionMeter,
+StealthEye, NotificationToast.
+
+**Start state:** TASK-050B (ValueBar/TimerBar), TASK-014 (data
+binding schema) complete.
+
+**End state:** All 6 specialised HUD components render correctly
+with live data bindings. ResourceBar animates damage flash and
+regen. ShoutMeter shows word-count segmentation. CompassRose
+renders heading with marker overlay.
+
+**Definition of done:**
+- ResourceBar: damage flash on health loss, regen shimmer visible
+- ShoutMeter: 3-word segmentation visible, cooldown animates
+- CompassRose: rotates with player heading, shows quest markers
+- DetectionMeter: transitions between Hidden/Caution/Detected
+- StealthEye: fills proportionally to detection level
+- NotificationToast: appears, persists, fades on timer
+
+**Reference:** `systems/component-library.md` § Specialised HUD Components
+
+---
+
+## Phase 7 — Screens
+
+Each screen is an independent task. All require Phase 6 (component
+library) and Phase 2 (input) complete. Screens using FacetedList
+require TASK-050C.
 
 ---
 
 ### TASK-051 · Inventory Screen
 
-**Start state:** TASK-050 complete.
+**Start state:** TASK-050C complete.
 **End state:** Inventory screen fully functional with FacetedList,
 item detail panel, sort controls, all item categories, and all
 item action verbs (equip, drop, favourite, inspect).
@@ -569,44 +863,52 @@ item action verbs (equip, drop, favourite, inspect).
 condition, select and equip an item, drop an item, mark favourite.
 Provenance stamp visible in detail panel for stamped items.
 
+**Reference:** `screens/inventory-barter-container.md`
+
 ---
 
 ### TASK-052 · Barter Screen
 
-**Start state:** TASK-050 complete.
+**Start state:** TASK-050C complete.
 **End state:** Player inventory and merchant inventory side by side.
 Offer panel. Gold/value display. Transaction confirm. Sentimental
 item protection fires on attempt to add sentimental item to offer.
 **Definition of done:** Complete a buy, complete a sell, attempt to
 sell sentimental item and receive confirmation prompt.
 
+**Reference:** `screens/inventory-barter-container.md`
+
 ---
 
 ### TASK-053 · Container Screen
 
-**Start state:** TASK-050 complete.
+**Start state:** TASK-050C complete.
 **End state:** Player inventory and container inventory side by side.
 Take All (skips sentimental). Transfer individual items. Search
 across both lists.
 **Definition of done:** Take All skips sentimental items. Individual
 transfer works both directions.
 
+**Reference:** `screens/inventory-barter-container.md`
+
 ---
 
 ### TASK-054 · Magic Screen
 
-**Start state:** TASK-050 complete.
+**Start state:** TASK-050C complete.
 **End state:** Spells, powers, shouts and lesser powers in FacetedList.
 Equip to left/right hand. Favourite. Shout section shows word unlock
 and cooldown state.
 **Definition of done:** Equip spell to both hands, favourite a shout,
 filter by school.
 
+**Reference:** `screens/magic-spells-shouts.md`
+
 ---
 
 ### TASK-055 · Crafting Screens
 
-**Start state:** TASK-050 complete.
+**Start state:** TASK-050C complete.
 **End state:** Smithing forge (craft), smithing workbench (temper),
 alchemy lab, and enchanting table. All functional. Provenance stamp
 written on confirmed craft action. Dedication field presented after
@@ -615,64 +917,88 @@ confirmation.
 skill level and date. Dedication entered and stored. Stamp visible
 in inventory detail panel.
 
+**Reference:** `screens/crafting.md`
+
 ---
 
 ### TASK-056 · Quest Journal
 
-**Start state:** Phase 1, Phase 2 complete.
+**Start state:** Phase 6, Phase 2 complete.
 **End state:** Active and completed quests. Quest stages and objectives.
-Map marker integration. Sort by faction, type, date.
+Map marker integration. Sort by faction, type, date. Dialogue history
+per quest (stage-implied mechanism for vanilla quests).
 **Definition of done:** All active quests visible, objectives correct,
-completed quests accessible.
+completed quests accessible. Dialogue history shows conversation
+transcripts attributed to correct NPCs.
+
+**Reference:** `screens/quest-journal.md`
 
 ---
 
 ### TASK-057 · Map Screen
 
-**Start state:** Phase 1, Phase 2 complete.
-**End state:** World map with markers, zoom, fast travel.
-**Definition of done:** Open map, place custom marker, fast travel
-to a known location.
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** World map with markers, zoom, fast travel, free text
+search, marker type filtering, quest marker colour coding. World
+beacons placeable and persistent via cosave.
+**Definition of done:** Open map, search for a location by name,
+place a beacon, fast travel to a known location. Beacon persists
+after save/reload.
+
+**Reference:** `screens/map.md`
 
 ---
 
 ### TASK-058 · Skills Screen
 
-**Start state:** Phase 1, Phase 2 complete. Investigation into
+**Start state:** Phase 6, Phase 2 complete. Investigation into
 constellation rendering approach complete.
 **End state:** All 18 skill trees functional. Perk acquisition
-functional. Level up perk points correctly tracked.
+functional. Level up perk points correctly tracked. Perk description
+panel with structured info (name, rank, effect, requirements).
 **Definition of done:** Spend a perk point, confirm tree updates.
+Perk description shows all ranks and requirements.
+
+**Reference:** `screens/skills.md`
 
 ---
 
 ### TASK-059 · Dialogue Screen
 
-**Start state:** Phase 1, Phase 2 complete.
+**Start state:** Phase 6, Phase 2 complete.
 **End state:** Topic list, subtitles, speaker attribution, full
-sentence preview option.
+sentence preview option. Speaker portrait (real-or-nothing — render
+if available, omit gracefully if not).
 **Definition of done:** Complete a branching dialogue tree without
-missing any response options.
+missing any response options. Speaker name and portrait displayed.
+
+**Reference:** `screens/dialogue.md`
 
 ---
 
 ### TASK-060 · Level Up Screen
 
-**Start state:** Phase 1, Phase 2 complete.
-**End state:** Attribute selection (Health/Magicka/Stamina), skill
-summary for the level, perk point award notification.
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Attribute selection (Health/Magicka/Stamina), impact
+preview showing stat consequences of each choice, skill summary for
+the level, perk point award notification.
 **Definition of done:** Level up, select attribute, confirm point
-awarded and attribute increased.
+awarded and attribute increased. Impact preview shows before/after
+values for the selected attribute.
+
+**Reference:** `screens/level-up.md`
 
 ---
 
 ### TASK-061 · Main Menu
 
-**Start state:** Phase 1, Phase 2 complete.
-**End state:** Main menu, New Game, New Game+ flow, Settings entry
-point.
-**Definition of done:** New game starts, New Game+ configuration
-screen accessible, settings opens.
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Main menu with Continue, New Game, Load Game, Settings,
+Credits, Quit. Settings entry point functional.
+**Definition of done:** All menu options functional. New Game starts
+a new game. Continue loads most recent save. Settings opens.
+
+**Reference:** `screens/main-menu.md`
 
 ---
 
@@ -687,6 +1013,8 @@ selected by default.
 cards display with correct name/level/location/portrait. Most recent
 is pre-selected.
 
+**Reference:** `screens/load-game.md`
+
 ---
 
 ### TASK-063 · Load Game Screen — Save Browser
@@ -699,6 +1027,8 @@ delete (with confirmation).
 **Definition of done:** Select character, see all saves. Mod list
 delta shows correctly for a save with a missing mod. Manual save
 rename persists after reload.
+
+**Reference:** `screens/load-game.md`
 
 ---
 
@@ -713,19 +1043,226 @@ reads texture and displays on character card.
 **Definition of done:** Save game, reload — character card shows
 portrait matching character's current appearance and outfit.
 
----
-
-### TASK-065 · Remaining Screens
-
-**Start state:** Phase 1, Phase 2 complete.
-Covers: Wait/Sleep screen, Loading screen, Stats screen, Tween menu,
-Favourites radial, Gift menu, Edit mode chrome.
-Each is small enough to batch into one session. Split further if any
-proves larger than expected.
+**Reference:** `screens/load-game.md`
 
 ---
 
-## Phase 6 — Provenance Stamps
+### TASK-065 · Wait and Sleep Screen
+
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Distinct Wait and Sleep screens. Extended duration
+slider (72hr default, configurable). Time picker with direct input.
+Quick increment buttons. Danger indicator (Safe through Do Not Sleep
+Here). Rest bonus information with live feedback as duration changes.
+**Definition of done:** Wait 48 hours using extended slider. Sleep
+and see rest bonus update as duration changes. Danger indicator
+displays appropriate level for current location.
+
+**Reference:** `screens/wait-sleep.md`
+
+---
+
+### TASK-066 · Loading Screen
+
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Loading screen with tip display, item card for
+featured items, progress indicator.
+**Definition of done:** Loading screen appears during cell transition
+with tip and progress bar.
+
+**Reference:** `screens/loading-screen.md`
+
+---
+
+### TASK-067 · Stats Screen
+
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Vanilla stats presented cleanly in organised tabs.
+**Definition of done:** All vanilla stat categories visible and
+correctly populated.
+
+**Reference:** `screens/stats.md`
+
+---
+
+### TASK-068 · Tween Menu
+
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Configurable radial quick-nav widget. Default 6 slots
+(Inventory, Magic, Map, Skills, Wait, MCM). Inline configuration via
+edit mode — reassign destinations from live registry, add/remove
+slots. Slot configuration persisted in cosave.
+**Definition of done:** Open tween menu, navigate to each default
+destination. Enter edit mode, reassign a slot to a different
+destination, confirm it persists after reload.
+
+**Reference:** `screens/tween-menu.md`
+
+---
+
+### TASK-069 · Favourites Radial
+
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Favourites radial with slot types: weapon, spell,
+shout, potion (smart selection), outfit, item. Outfit integration
+if outfit system available. Equip from radial. Cycle groups.
+**Definition of done:** Assign a weapon, spell, and potion to radial
+slots. Equip each from the radial. Potion smart selection picks
+optimal potion from available stock.
+
+**Reference:** `screens/favourites-radial.md`
+
+---
+
+### TASK-069B · Gift Menu
+
+**Start state:** Phase 6, Phase 2 complete.
+**End state:** Gift menu with disposition indicator, item staging
+panel, NPC acceptance/rejection feedback.
+**Definition of done:** Open gift menu with a follower, stage items,
+confirm gift. Disposition indicator visible.
+
+**Reference:** `screens/gift-menu.md`
+
+---
+
+## Phase 8 — Message Log
+
+Requires Phase 3 (DSL runtime) and Phase 2 (input) complete.
+
+---
+
+### TASK-075 · Message Stream Infrastructure
+
+**What:** The core append-only message stream with typed messages,
+publisher registration, and subscriber notification.
+
+**Start state:** Phase 0 complete.
+
+**End state:** A message stream that accepts typed messages with
+content, type, timestamp, source, priority, and lifetime hint.
+Publishers fire-and-forget into the stream. Subscribers receive
+filtered notifications. Built-in publishers: notification intercept,
+subtitle intercept, quest update, skill increase, OHUI system.
+
+**Definition of done:**
+- Native notification call publishes to stream as `notification` type
+- Subtitle event publishes as `subtitle_interactive` or `subtitle_ambient`
+- Subscriber with type filter receives only matching messages
+- Stream retains all messages for session duration
+
+**Reference:** `systems/message-log.md` § Architecture
+
+---
+
+### TASK-076 · HUD Message Widget
+
+**What:** The on-screen message display — a configurable viewport
+into the message stream.
+
+**Start state:** TASK-075, TASK-050H (NotificationToast component)
+complete.
+
+**End state:** A HUD widget that displays recent messages from the
+stream, filtered by type, with configurable fade timing, maximum
+visible count, and anchor position. Replaces vanilla notification
+and subtitle display.
+
+**Definition of done:**
+- Messages appear on screen when published to stream
+- Messages fade after lifetime expires
+- Scrolling back reveals older faded messages
+- Type filter hides/shows message categories
+- Widget participates in edit mode (position, size, visibility)
+
+**Reference:** `systems/message-log.md` § HUD Message Widget
+
+---
+
+### TASK-077 · Message Log Panel
+
+**What:** The full persistent log panel — tabbed, searchable,
+scrollable.
+
+**Start state:** TASK-075, Phase 6 (component library) complete.
+
+**End state:** A modal panel accessible from any context. Tabbed by
+message type. Chronological. Searchable. Per-entry copy to clipboard.
+Panel-level copy. Quest-attributed entries link to journal.
+
+**Definition of done:**
+- All message types appear under correct tabs
+- Search filters across all types
+- Copy single entry to clipboard
+- Copy entire tab to clipboard
+- Custom mod-registered type appears as its own tab
+
+**Reference:** `systems/message-log.md` § Message Log Panel
+
+---
+
+## Phase 9 — Mod Registration API
+
+Requires Phase 6 (component library) for UI surfaces.
+Can begin implementation of the pattern infrastructure alongside
+Phase 6.
+
+---
+
+### TASK-085 · Registration Pattern Infrastructure
+
+**What:** The shared registration infrastructure — manifest
+validation, window management, logging, versioned contract support.
+
+**Start state:** Phase 0 complete.
+
+**End state:** A registration framework that all extension points
+use. Manifest validation (mod ID, display name, version, API version).
+Registration window enforcement (post-load for non-MCM, re-open on
+save load for MCM). Validation failures logged consistently. Soft
+dependency guarantee — empty state for every registration point is
+defined and functional.
+
+**Definition of done:**
+- Registration during valid window accepted
+- Registration outside window rejected with warning log
+- Missing mod ID rejected
+- Duplicate mod ID at same point: second supersedes first
+- API version higher than supported: rejected with clear message
+
+**Reference:** `systems/mod-registration-api.md`
+
+---
+
+### TASK-086 · Screen-Specific Registration Points
+
+**What:** Implement each individual registration point at the screens
+that consume them.
+
+**Start state:** TASK-085 complete. Relevant screen tasks complete.
+
+**End state:** All registration points functional:
+- Sleep screen: survival mod registration
+- Message log: custom type registration
+- Magic screen: custom spell school registration
+- Loading screen: scene registration
+- Stats screen: custom stat registration
+- FacetedList: custom facet registration
+- Favourites radial: custom slot type registration
+- HUD: widget registration (mod-authored widgets)
+
+**Definition of done:**
+- A test mod registers a survival need — appears in sleep screen panel
+- A test mod registers a custom message type — appears as tab in log
+- A test mod registers a custom facet — appears in FacetPanel
+- A test mod registers a HUD widget — appears on canvas in edit mode
+- All registration points return graceful empty state when nothing registered
+
+**Reference:** `systems/mod-registration-api.md` § Registration Points
+
+---
+
+## Phase 10 — Provenance Stamps
 
 Requires TASK-055 (crafting screens) and TASK-004 (cosave).
 
@@ -770,9 +1307,11 @@ it in the collapsible section.
 - Stamp API correctly identifies crafted vs looted items
 - External mod reads dedication via API correctly
 
+**Reference:** `systems/provenance-stamps.md`
+
 ---
 
-## Phase 7 — Localisation
+## Phase 11 — Localisation
 
 Can begin as soon as Phase 0 is complete. Independent of all other
 phases, but blocks release of any user-visible text.
@@ -790,6 +1329,8 @@ sets covering Skyrim's 13 languages.
 German strings resolve correctly. Missing key returns default, not
 raw key.
 
+**Reference:** `systems/localisation.md`
+
 ---
 
 ### TASK-081 · RTL Layout
@@ -801,6 +1342,8 @@ resolve correctly for both LTR and RTL. Visual test: a simple
 two-column layout mirrors correctly in RTL.
 **Definition of done:** LTR layout correct. RTL layout mirrors
 correctly. No hardcoded `left`/`right` in any first-party component.
+
+**Reference:** `systems/localisation.md`
 
 ---
 
@@ -815,51 +1358,472 @@ rendered where CBDT/COLRv1 supported, monochrome otherwise.
 string renders without tofu. Emoji codepoint renders. Skin with
 Latin-only font falls back to Noto for Cyrillic.
 
+**Reference:** `systems/localisation.md`
+
+---
+
+## Phase 12 — Compatibility Layers
+
+Requires Phase 6 (component library) for UI rendering.
+
+---
+
+### TASK-090 · UIExtensions Compatibility Shim
+
+**What:** Intercept UIExtensions Papyrus calls and render via OHUI
+components.
+
+**Start state:** Phase 6 complete.
+
+**End state:** UIExtensions Papyrus API surface (OpenMenu, OpenInputMenu,
+GetMenuResultString, GetMenuResultInt, AddEntryItem, AddEntryText,
+SetMenuPropertyString, SetMenuPropertyInt) intercepted and routed to
+OHUI components. Functions as standalone implementation — mods do not
+require UIExtensions installed when OHUI is present.
+
+**Definition of done:**
+- A mod calling OpenMenu(ItemMenu) gets an OHUI selection list
+- A mod calling OpenInputMenu gets an OHUI input dialog with OSK
+- Return values match UIExtensions format exactly
+- Works without UIExtensions installed
+- Works alongside UIExtensions (shim takes priority for covered calls)
+
+**Reference:** `compatibility.md` § UIExtensions
+
+---
+
+### TASK-091 · Native Notification Intercept
+
+**What:** Intercept Skyrim's native notification function and publish
+into the message stream.
+
+**Start state:** TASK-075 (message stream) complete.
+
+**End state:** Native notification calls from any mod publish as
+`notification` typed messages in the OHUI message stream. Attribution
+to calling mod where determinable. Always on — not disableable.
+
+**Definition of done:**
+- Native notification call from a mod appears in message log
+- Message typed correctly as `notification`
+- Message persists in log after on-screen display fades
+
+**Reference:** `compatibility.md` § Native Notification System
+
+---
+
+## Phase 13 — Frozen Giant Integrations
+
+Requires relevant screen tasks complete. Each integration is
+independent and can be built in parallel.
+
+---
+
+### TASK-095 · Survival Mod Integrations (Sunhelm, Frostfall, iNeed, Campfire)
+
+**What:** Native support for the four survival/camping frozen giants.
+
+**Start state:** TASK-065 (wait/sleep screen) complete.
+
+**End state:** OHUI detects each mod at startup, reads their exposed
+data, and surfaces it in the sleep screen survival context panel and
+HUD status indicators. Graceful fallback when absent.
+
+**Definition of done:**
+- Sunhelm installed: hunger, thirst, fatigue, cold visible in sleep
+  screen. HUD status indicators active.
+- Frostfall installed: temperature and warmth data visible in sleep screen.
+- iNeed installed: needs visible in sleep screen (distinct from Sunhelm).
+- Campfire installed: warmth source detection feeds sleep screen.
+- Any absent: corresponding panel/indicator absent, no error.
+- Log shows detection result for each on startup.
+
+**Reference:** `compatibility.md` § Frozen Giants
+
+---
+
+### TASK-096 · Follower Framework Integrations (NFF, AFT)
+
+**What:** Native support for follower tracking data from NFF and AFT.
+
+**Start state:** TASK-057 (map screen) complete.
+
+**End state:** Follower location, state, and assignment data feeds
+the map screen NPC tracking feature. NFF and AFT detected and used
+as data sources. Graceful fallback when absent.
+
+**Definition of done:**
+- NFF installed: followers appear as trackable NPCs on map with
+  current location
+- AFT installed: same feature, AFT data model
+- Neither installed: NPC tracking shows only vanilla followers
+- Log shows detection result on startup
+
+**Reference:** `compatibility.md` § Frozen Giants
+
+---
+
+### TASK-097 · LOTD Integration
+
+**What:** Native support for Legacy of the Dragonborn across
+map markers, custom skill trees, quest journal, and tween menu.
+
+**Start state:** TASK-057 (map), TASK-058 (skills), TASK-056
+(quest journal), TASK-068 (tween menu) complete.
+
+**Definition of done:**
+- LOTD map markers appear on map screen
+- LOTD skill trees render in skills screen
+- LOTD quests appear in quest journal with full feature set
+- LOTD screens available as tween menu destinations
+- LOTD absent: all above absent, no error
+
+**Reference:** `compatibility.md` § Frozen Giants
+
+---
+
+### TASK-098 · Dirt and Blood / General Stores Integration
+
+**What:** Native support for Dirt and Blood (HUD status indicators)
+and General Stores (barter/economy data).
+
+**Start state:** Relevant screen tasks complete.
+
+**Definition of done:**
+- Dirt and Blood installed: dirt/blood status visible in HUD
+- General Stores installed: merchant data available in barter screen
+- Either absent: corresponding feature absent, no error
+
+**Reference:** `compatibility.md` § Frozen Giants
+
+---
+
+## Phase 14 — First-Party HUD Widgets
+
+Requires Phase 3 (DSL runtime) and TASK-014 (data binding schema)
+complete. Each widget is independent.
+
+---
+
+### TASK-100 · Health / Stamina / Magicka Bars
+
+**What:** The three primary resource bars as DSL-defined widgets
+using the ResourceBar component.
+
+**Start state:** TASK-050H, TASK-026, TASK-014 complete.
+
+**End state:** Three widgets on the HUD canvas. Each bound to its
+respective vital binding. Damage flash, regen animation, threshold
+colour shifts. Frame-driven update mode. Default positions per
+resolution preset. Fully skinnable.
+
+**Definition of done:**
+- Health bar drains smoothly during combat damage
+- Stamina bar depletes during sprint
+- Magicka bar depletes on spell cast and regens visibly
+- All three participate in edit mode
+- Skin token override changes bar colours
+
+---
+
+### TASK-101 · Compass Widget
+
+**What:** The compass rose as a first-party HUD widget.
+
+**Start state:** TASK-050H (CompassRose component), TASK-014 complete.
+
+**End state:** Compass widget on HUD canvas. Shows cardinal directions,
+rotates with player heading. Quest markers and location markers
+overlaid. Throttled reactive update mode (~15fps).
+
+**Definition of done:**
+- Compass rotates with heading
+- Active quest marker visible on compass
+- Discovered location markers visible at appropriate range
+- Participates in edit mode
+
+---
+
+### TASK-102 · Shout Cooldown Meter
+
+**What:** Shout cooldown as a first-party HUD widget.
+
+**Start state:** TASK-050H (ShoutMeter component), TASK-014 complete.
+
+**End state:** Widget shows shout cooldown progress. Word-count
+segmentation markers. Hidden when no shout equipped or cooldown
+complete.
+
+**Definition of done:**
+- Shows cooldown draining after shout use
+- Segmentation markers match equipped shout word count
+- Hidden when no shout equipped
+
+---
+
+### TASK-103 · Stealth / Detection Widgets
+
+**What:** Detection meter and stealth eye as first-party HUD widgets.
+
+**Start state:** TASK-050H, TASK-014 complete.
+
+**End state:** Two widgets: DetectionMeter (graduated indicator) and
+StealthEye (classic eye icon). Both bound to sneak detection bindings.
+Both reactive — only render when sneaking.
+
+**Definition of done:**
+- Both appear when player enters sneak
+- Both hide when player exits sneak
+- Detection state transitions animate smoothly
+- Both participate in edit mode independently
+
+---
+
+### TASK-104 · Enemy Health Bar
+
+**What:** Enemy/target health bar as a first-party HUD widget.
+
+**Start state:** TASK-050B (ValueBar), TASK-014 complete.
+
+**End state:** Widget appears when player has a combat target.
+Shows enemy name, level, health bar. Boss variant with distinct
+presentation. Hidden when no target.
+
+**Definition of done:**
+- Appears on crosshair target in combat
+- Shows name, level, health
+- Boss enemy shows boss bar variant
+- Hidden when no target
+
+---
+
+### TASK-105 · Active Effects Widget
+
+**What:** Display of active magic effects on the HUD.
+
+**Start state:** TASK-050B, TASK-014 complete.
+
+**Note:** Blocked on list-binding design (data-binding-schema.md
+open question 2). Requires a list-typed binding for active effects.
+Design the list binding mechanism as part of this task.
+
+**Definition of done:**
+- Active effects display with icon and remaining duration
+- Effects appear/disappear as they are applied/expire
+- Participates in edit mode
+
+---
+
+### TASK-106 · Notification / Quest Update Toast
+
+**What:** On-screen transient message display as a first-party widget.
+
+**Start state:** TASK-075 (message stream), TASK-050H (NotificationToast)
+complete.
+
+**End state:** Widget subscribes to the message stream. Displays
+recent notifications, quest updates, and skill increases with
+configured fade timing. Replaces vanilla notification positioning.
+
+**Definition of done:**
+- Notification from native call appears on screen
+- Quest update banner appears with quest name
+- Messages fade after configured duration
+- Participates in edit mode
+
+---
+
+### TASK-107 · Breath / Oxygen Meter
+
+**What:** Underwater breath meter as a first-party HUD widget.
+
+**Start state:** TASK-050B (ValueBar), TASK-014 complete.
+
+**End state:** Widget appears when player is underwater. Shows
+breath depletion. Hidden when breath is full or player is not
+submerged.
+
+**Definition of done:**
+- Appears when submerged
+- Drains as breath depletes
+- Hidden when surfaced and breath full
+
+---
+
+### TASK-108 · Quick Loot Widget
+
+**What:** Quick loot panel that appears on container interaction
+without opening the full container screen.
+
+**Start state:** Phase 6, Phase 2, TASK-014 complete.
+
+**End state:** A HUD widget that appears when the player's crosshair
+is on a lootable container. Shows container contents in a compact
+list. Player can take items directly. Dismisses on look-away.
+
+**Definition of done:**
+- Panel appears on container crosshair
+- Items listed with name and value
+- Take single item via keypress
+- Take all via keypress
+- Panel dismisses on crosshair away
+
+---
+
+## Phase 15 — New Game+ Flow
+
+Requires TASK-061 (main menu), TASK-004 (cosave), and TASK-070
+(stamp system) complete.
+
+---
+
+### TASK-110 · New Game+ Configuration Screen
+
+**What:** The New Game+ configuration screen accessible from the
+main menu New Game flow.
+
+**Start state:** TASK-061, TASK-004, TASK-070 complete.
+
+**End state:** Player can choose New Game+ from the New Game prompt.
+Configuration screen presents carry-forward categories (perk points,
+known spells, crafting recipes, shout words, map memory, books read,
+faction standing, heirloom items). Each category toggleable. Heirloom
+item selection from source save inventory. Legacy summary generated
+and presented before confirmation.
+
+**Definition of done:**
+- New Game+ option available from main menu
+- All carry-forward categories toggleable
+- Heirloom items selectable (up to configurable max)
+- Legacy summary displays character accomplishments
+- Confirmation creates new save with selected carry-forward data
+
+**Reference:** `screens/main-menu.md` § New Game+
+
+---
+
+### TASK-111 · New Game+ Companion Plugin
+
+**What:** The gameplay-side companion plugin that executes the
+mutations selected in the configuration screen.
+
+**Start state:** TASK-110 complete.
+
+**End state:** On new game start with New Game+ active, the companion
+plugin applies selected carry-forward data: perk point pool, known
+spells, crafting recipes, shout words, map markers, book read flags,
+faction standing values, heirloom items placed in starting chest.
+
+**Definition of done:**
+- Perk points available as pool (no perks pre-selected)
+- Known spells in spell list (tomes still exist in world)
+- Heirloom items in starting location chest with stamps intact
+- Map markers visible but locations uncleared
+
+**Reference:** `screens/main-menu.md` § New Game+
+
 ---
 
 ## Dependency Graph (summary)
 
 ```
 Phase 0 (TASK-001–005)
-  └── Phase 1 (TASK-010–013)  ← widget runtime
-        └── Phase 2 (TASK-020–022)  ← input
-              └── Phase 5 (TASK-050–065)  ← screens
-                    └── Phase 6 (TASK-070–071)  ← stamps
-
-Phase 0
-  └── Phase 3 (TASK-030–033)  ← MCM compat
-        └── Phase 4 (TASK-040–043)  ← MCM2 native
-
-Phase 0
-  └── Phase 7 (TASK-080–082)  ← localisation (parallel to all)
+  ├── Phase 1 (TASK-010–014)  ← widget runtime + data binding schema
+  │     └── Phase 2 (TASK-020–022)  ← input
+  │           └── Phase 6 (TASK-050A–050H)  ← component library
+  │                 └── Phase 7 (TASK-051–069B)  ← screens
+  │                       ├── Phase 10 (TASK-070–071)  ← stamps
+  │                       ├── Phase 13 (TASK-095–098)  ← frozen giants
+  │                       └── Phase 15 (TASK-110–111)  ← new game+
+  │
+  ├── Phase 3 (TASK-025–028)  ← DSL runtime
+  │     ├── Phase 6 (merges here — components need DSL)
+  │     ├── Phase 8 (TASK-075–077)  ← message log
+  │     └── Phase 14 (TASK-100–108)  ← first-party HUD widgets
+  │
+  ├── Phase 4 (TASK-030–033)  ← MCM compat
+  │     └── Phase 5 (TASK-040–043)  ← MCM2 native
+  │
+  ├── Phase 9 (TASK-085–086)  ← mod registration API
+  │
+  ├── Phase 11 (TASK-080–082)  ← localisation (parallel to all)
+  │
+  └── Phase 12 (TASK-090–091)  ← compatibility layers
 ```
 
-Phases 3–4 (MCM) are fully independent of Phases 1–2 (widget runtime).
-They can be built in parallel by separate Code sessions.
-Phase 7 (localisation) is independent of everything and can run
-alongside any phase.
+**Key dependency notes:**
+- Phase 3 (DSL runtime) is the architectural spine. Phase 6
+  (components) requires it. Phase 14 (HUD widgets) requires it.
+  This is the critical path.
+- Phase 4 (MCM compat) is fully independent of Phases 1–3.
+  Can be built in parallel by separate sessions.
+- Phase 11 (localisation) is independent of everything and can
+  run alongside any phase.
+- Phase 9 (mod registration) can begin pattern infrastructure
+  during Phase 6, but screen-specific points need their screens.
+- Phase 13 (frozen giants) and Phase 15 (New Game+) are late-stage
+  and depend on multiple screens being complete.
+
+---
+
+## Open Design Questions (must resolve before dependent tasks start)
+
+These are unresolved design decisions identified across the documentation.
+Each blocks or affects specific tasks.
+
+1. **Compositor ownership** — Scaleform layer or native DirectX layer?
+   Affects TASK-027, TASK-028. Must resolve before Phase 3 is locked.
+   *Source: dsl-and-skinning.md, performance-model.md*
+
+2. **VR rendering architecture** — Scaleform and input differences.
+   VR is a day-one target. Affects Phase 3 (DSL runtime), Phase 2
+   (input). Must be investigated early.
+   *Source: dsl-and-skinning.md*
+
+3. **Skills constellation rendering** — 3D scene vs native C++ widget
+   vs dedicated approach. Affects TASK-058 scope and timeline.
+   *Source: dsl-and-skinning.md, skills.md*
+
+4. **List-typed bindings** — enemy multi-target, active effects,
+   compass markers all need list bindings not yet designed. Blocks
+   TASK-105 and full TASK-101, TASK-104 scope.
+   *Source: data-binding-schema.md*
+
+5. **Danger indicator data reliability** — can OHUI reliably
+   approximate threat level from available SKSE data? If unreliable,
+   danger indicator does not ship. Affects TASK-065 scope.
+   *Source: wait-sleep.md*
+
+6. **Dialogue tree extraction mechanism** — stage-implied dialogue
+   and background compilation are novel. Prototype needed before
+   TASK-056 dialogue history scope is confirmed.
+   *Source: quest-journal.md*
+
+7. **Tween menu secondary slot access** — hold-vs-tap or sub-menu
+   for secondary directions. Affects TASK-068 interaction design.
+   *Source: tween-menu.md*
 
 ---
 
 ## Not Yet Tasked
 
-The following design documents exist but have not been broken into
-implementation tasks. They depend on implementation decisions not
-yet made or on prior phases being proven in production first.
+The following items are identified in the documentation but not
+broken into tasks. They are post-1.0 features, require further
+design, or depend on prior phases being proven.
 
-- `systems/message-log.md` — unified message log
-- `systems/mod-registration-api.md` — facet, widget, and HUD
-  registration extension points
-- DSL parser/runtime — the engine that reads widget definition files
-  and drives rendering; architectural spine, needs a dedicated task
-- First-party HUD widgets — 12+ widgets (health/stamina/magicka bars,
-  compass, enemy health, sneak eye, shout meter, notification toast,
-  etc.) each need a build task once the DSL runtime exists
-- UIExtensions compatibility shim — fully specified in compatibility.md,
-  no implementation task written
-- Frozen giant native integrations — 9 mods, each needs a task
-- New Game+ flow — depends on cosave and multiple screen phases
-- DSL tooling — syntax highlighting, error reporting, validation
-  toolchain for mod authors
-- Data binding schema implementation — `systems/data-binding-schema.md`
-  is now written; needs a corresponding TASK entry
+- **DSL tooling** — syntax highlighting, error reporting, validation
+  toolchain for mod authors. Important for adoption, not a launch
+  blocker.
+- **Stats screen extensibility** — mod registration API for custom
+  tracked values. Post-1.0, depends on stamp system and registration
+  pattern maturity.
+- **New Game+ LOTD integration** — museum knowledge carry-forward.
+  Depends on LOTD integration (TASK-097) and New Game+ (TASK-110).
+- **Live character render on load game** — post-1.0 exploratory.
+- **3D loading screen scenes** — Tier 3 from loading-screen.md.
+  Post-1.0 exploratory.
+- **Map live location preview** — post-1.0 exploratory.
+- **Share to web** — message log panel share button. Post-1.0,
+  requires web service infrastructure.
+- **Outfit system** — referenced by inventory, container, favourites
+  radial, and New Game+. Needs its own design document before tasking.
