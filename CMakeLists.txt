@@ -134,6 +134,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ohui_compile_options
 )
 
+# ---- Tests ----
+enable_testing()
+add_subdirectory(tests)
+
 # ---- Post build ----
 # Set SKYRIM_MODS_PATH env var to auto-copy DLL to your mod manager's staging folder
 if(DEFINED ENV{SKYRIM_MODS_PATH})
