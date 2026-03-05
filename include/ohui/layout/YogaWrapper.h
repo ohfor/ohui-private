@@ -13,7 +13,8 @@ enum class FlexWrap { NoWrap, Wrap, WrapReverse };
 enum class Display { Flex, None };
 enum class Overflow { Visible, Hidden, Scroll };
 enum class PositionType { Relative, Absolute };
-enum class Edge { Left, Top, Right, Bottom, All };
+enum class Direction { LTR, RTL, Inherit };
+enum class Edge { Left, Top, Right, Bottom, Start, End, All };
 
 struct LayoutRect {
     float left{};
@@ -71,6 +72,7 @@ public:
     void SetOverflow(Overflow value);
     void SetPositionType(PositionType value);
     void SetPosition(Edge edge, float value);
+    void SetDirection(Direction dir);
 
     // Result (valid after CalculateLayout)
     LayoutRect GetLayoutRect() const;
@@ -78,8 +80,12 @@ public:
 private:
     std::unique_ptr<LayoutNodeImpl> m_impl;
     friend void CalculateLayout(LayoutNode& root, float availableWidth, float availableHeight);
+    friend void CalculateLayout(LayoutNode& root, float availableWidth, float availableHeight,
+                                Direction direction);
 };
 
 void CalculateLayout(LayoutNode& root, float availableWidth, float availableHeight);
+void CalculateLayout(LayoutNode& root, float availableWidth, float availableHeight,
+                     Direction direction);
 
 }  // namespace ohui::layout

@@ -99,12 +99,23 @@ static YGPositionType ToYG(PositionType p) {
     return YGPositionTypeRelative;
 }
 
+static YGDirection ToYG(Direction d) {
+    switch (d) {
+        case Direction::LTR:     return YGDirectionLTR;
+        case Direction::RTL:     return YGDirectionRTL;
+        case Direction::Inherit: return YGDirectionInherit;
+    }
+    return YGDirectionLTR;
+}
+
 static YGEdge ToYG(Edge e) {
     switch (e) {
         case Edge::Left:   return YGEdgeLeft;
         case Edge::Top:    return YGEdgeTop;
         case Edge::Right:  return YGEdgeRight;
         case Edge::Bottom: return YGEdgeBottom;
+        case Edge::Start:  return YGEdgeStart;
+        case Edge::End:    return YGEdgeEnd;
         case Edge::All:    return YGEdgeAll;
     }
     return YGEdgeAll;
@@ -223,6 +234,10 @@ void LayoutNode::SetPosition(Edge edge, float value) {
     YGNodeStyleSetPosition(m_impl->node, ToYG(edge), value);
 }
 
+void LayoutNode::SetDirection(Direction dir) {
+    YGNodeStyleSetDirection(m_impl->node, ToYG(dir));
+}
+
 LayoutRect LayoutNode::GetLayoutRect() const {
     return {
         YGNodeLayoutGetLeft(m_impl->node),
@@ -234,6 +249,11 @@ LayoutRect LayoutNode::GetLayoutRect() const {
 
 void CalculateLayout(LayoutNode& root, float availableWidth, float availableHeight) {
     YGNodeCalculateLayout(root.m_impl->node, availableWidth, availableHeight, YGDirectionLTR);
+}
+
+void CalculateLayout(LayoutNode& root, float availableWidth, float availableHeight,
+                     Direction direction) {
+    YGNodeCalculateLayout(root.m_impl->node, availableWidth, availableHeight, ToYG(direction));
 }
 
 }  // namespace ohui::layout
