@@ -19,6 +19,7 @@ enum class ErrorCode {
     InvalidBinding,
     ProfileNotFound,
     EditModeNotActive,
+    InvalidNamespace,
 };
 
 struct Error {

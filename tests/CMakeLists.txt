@@ -11,6 +11,7 @@ set(TEST_SOURCES
     DataBindingTests.cpp
     LayoutProfileTests.cpp
     EditModeTests.cpp
+    BindingSchemaTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
