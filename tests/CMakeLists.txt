@@ -3,6 +3,7 @@ find_package(Catch2 3 CONFIG REQUIRED)
 set(TEST_SOURCES
     SanityTests.cpp
     LayoutTests.cpp
+    CosaveTests.cpp
     # Each task appends here
 )
 

@@ -85,6 +85,7 @@ set(CORE_HEADERS
     include/ohui/core/Log.h
     include/ohui/core/Result.h
     include/ohui/core/Types.h
+    include/ohui/cosave/CosaveTypes.h
     include/ohui/cosave/CosaveManager.h
     include/ohui/cosave/PersistenceAPI.h
     include/ohui/dsl/USSParser.h

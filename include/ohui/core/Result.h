@@ -11,6 +11,8 @@ enum class ErrorCode {
     InvalidFormat,
     SizeLimitExceeded,
     DuplicateRegistration,
+    ChecksumMismatch,
+    IOError,
 };
 
 struct Error {

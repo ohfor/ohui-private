@@ -17,6 +17,9 @@ public:
         std::span<const uint8_t> data) const = 0;
     virtual bool FileExists(
         const std::filesystem::path& path) const = 0;
+    virtual bool RenameFile(
+        const std::filesystem::path& from,
+        const std::filesystem::path& to) const = 0;
 };
 
 }  // namespace ohui
