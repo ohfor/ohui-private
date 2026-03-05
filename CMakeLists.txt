@@ -78,6 +78,7 @@ set(CORE_SOURCES
     src/dsl/TokenStore.cpp
     src/layout/YogaWrapper.cpp
     src/widget/WidgetRegistry.cpp
+    src/binding/DataBindingEngine.cpp
     # Each task appends here
 )
 
@@ -97,6 +98,8 @@ set(CORE_HEADERS
     include/ohui/layout/YogaWrapper.h
     include/ohui/widget/WidgetTypes.h
     include/ohui/widget/WidgetRegistry.h
+    include/ohui/binding/BindingTypes.h
+    include/ohui/binding/DataBindingEngine.h
     # Each task appends here
 )
 

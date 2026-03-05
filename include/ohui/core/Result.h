@@ -15,6 +15,8 @@ enum class ErrorCode {
     IOError,
     NotRegistered,
     WidgetNotFound,
+    BindingNotFound,
+    InvalidBinding,
 };
 
 struct Error {
