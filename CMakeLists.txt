@@ -103,6 +103,7 @@ set(CORE_SOURCES
     src/i18n/StringTable.cpp
     src/widget/ModWidgetAPI.cpp
     src/binding/ModBindingAPI.cpp
+    src/message/MessageStream.cpp
     # Each task appends here
 )
 
@@ -161,6 +162,8 @@ set(CORE_HEADERS
     include/ohui/core/RegistrationTypes.h
     include/ohui/widget/ModWidgetAPI.h
     include/ohui/binding/ModBindingAPI.h
+    include/ohui/message/MessageTypes.h
+    include/ohui/message/MessageStream.h
     # Each task appends here
 )
 
