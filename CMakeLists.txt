@@ -90,6 +90,7 @@ set(CORE_SOURCES
     src/input/ActionRegistry.cpp
     src/input/RebindingStore.cpp
     src/input/ButtonPromptResolver.cpp
+    src/widget/ViewportManager.cpp
     # Each task appends here
 )
 
@@ -128,6 +129,8 @@ set(CORE_HEADERS
     include/ohui/input/ActionRegistry.h
     include/ohui/input/RebindingStore.h
     include/ohui/input/ButtonPromptResolver.h
+    include/ohui/widget/IViewportWidget.h
+    include/ohui/widget/ViewportManager.h
     # Each task appends here
 )
 
