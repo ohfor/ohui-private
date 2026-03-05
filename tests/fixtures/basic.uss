@@ -1,0 +1,35 @@
+/* Basic USS fixture for parser tests */
+
+:root {
+    --color-primary: #ff0000;
+    --color-secondary: #00ff00;
+    --spacing-base: 10px;
+}
+
+Button {
+    color: red;
+    width: 100px;
+}
+
+.highlighted {
+    opacity: 0.8;
+}
+
+#main-panel {
+    width: 100px;
+    height: 200px;
+}
+
+Button:hover {
+    color: blue;
+}
+
+// Line comment
+Panel Button {
+    margin: 5px;
+}
+
+Button.primary:hover {
+    background-color: var(--color-primary);
+    -ohui-glow: 1.5;
+}

@@ -88,6 +88,9 @@ set(CORE_HEADERS
     include/ohui/cosave/CosaveTypes.h
     include/ohui/cosave/CosaveManager.h
     include/ohui/cosave/PersistenceAPI.h
+    include/ohui/dsl/Selector.h
+    include/ohui/dsl/USSProperty.h
+    include/ohui/dsl/USSRule.h
     include/ohui/dsl/USSParser.h
     include/ohui/dsl/TokenStore.h
     include/ohui/layout/YogaWrapper.h

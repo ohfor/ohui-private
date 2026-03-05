@@ -4,6 +4,7 @@ set(TEST_SOURCES
     SanityTests.cpp
     LayoutTests.cpp
     CosaveTests.cpp
+    USSParserTests.cpp
     # Each task appends here
 )
 
