@@ -46,6 +46,10 @@ jobs:
         run: |
           cmake --build build/release --config Release
 
+      - name: Run tests
+        run: |
+          ctest --test-dir build/release --build-config Release --output-on-failure
+
       - name: Verify DLL built
         shell: bash
         run: |

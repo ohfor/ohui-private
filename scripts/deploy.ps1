@@ -5,10 +5,12 @@
 #   .\scripts\deploy.ps1 -Papyrus -Scripts OHUI_MCM,OHUI_Reset  - specific scripts only
 #   .\scripts\deploy.ps1 -PapyrusOnly - Compile Papyrus only (skip C++ build)
 #   .\scripts\deploy.ps1 -PapyrusOnly -Scripts OHUI_MCM         - single script only
+#   .\scripts\deploy.ps1 -SkipTests   - Build + deploy DLL, skip test gate
 
 param(
     [switch]$Papyrus,
     [switch]$PapyrusOnly,
+    [switch]$SkipTests,
     [string[]]$Scripts
 )
 
@@ -32,6 +34,23 @@ if (-not $PapyrusOnly) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "BUILD FAILED" -ForegroundColor Red
         exit 1
+    }
+
+    # --- Test gate (after build, before deploy) ---
+    if (-not $SkipTests) {
+        $testExe = "$BuildDir/tests/Release/ohui_tests.exe"
+        if (Test-Path $testExe) {
+            Write-Host "`n=== Running Tests ===" -ForegroundColor Cyan
+            ctest --test-dir $BuildDir --build-config Release --output-on-failure
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "TESTS FAILED - deploy blocked" -ForegroundColor Red
+                Write-Host "Use -SkipTests to deploy anyway" -ForegroundColor Yellow
+                exit 1
+            }
+            Write-Host "  All tests passed" -ForegroundColor Green
+        } else {
+            Write-Host "`n=== Tests not built - skipping ===" -ForegroundColor Yellow
+        }
     }
 
     Write-Host "`n=== Deploy DLL ===" -ForegroundColor Cyan
