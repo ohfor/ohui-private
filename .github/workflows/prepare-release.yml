@@ -1,0 +1,298 @@
+# Prepare a release branch with only public content
+#
+# Creates releases/review/X.Y.Z branch containing exactly what will go public.
+# Then builds the DLL from that branch to verify it compiles.
+# You can review the branch while the build runs.
+
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g., 1.0.0, without v prefix)'
+        required: true
+      skip_build:
+        description: 'Skip build verification (for testing workflow only)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write  # Required to push release branch
+
+jobs:
+  prepare:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version format
+        shell: bash
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format. Use X.Y.Z (e.g., 1.0.0)"
+            exit 1
+          fi
+
+      - name: Verify version consistency
+        shell: pwsh
+        run: |
+          $tagVersion = "${{ github.event.inputs.version }}"
+          $failed = $false
+
+          Write-Host "Expected version: $tagVersion"
+          Write-Host ""
+
+          # 1. Version.h
+          $versionH = Get-Content include/Version.h -Raw
+          if ($versionH -match 'MAJOR\s*=\s*(\d+)') { $major = $matches[1] }
+          if ($versionH -match 'MINOR\s*=\s*(\d+)') { $minor = $matches[1] }
+          if ($versionH -match 'PATCH\s*=\s*(\d+)') { $patch = $matches[1] }
+          $vH = "$major.$minor.$patch"
+          if ($vH -ne $tagVersion) {
+            Write-Host "::error::Version.h: $vH (expected $tagVersion)"
+            $failed = $true
+          } else {
+            Write-Host "Version.h: $vH"
+          }
+
+          # 2. CMakeLists.txt
+          $cmake = Get-Content CMakeLists.txt -Raw
+          if ($cmake -match 'VERSION_MAJOR\s+(\d+)') { $cmMajor = $matches[1] }
+          if ($cmake -match 'VERSION_MINOR\s+(\d+)') { $cmMinor = $matches[1] }
+          if ($cmake -match 'VERSION_PATCH\s+(\d+)') { $cmPatch = $matches[1] }
+          $vCmake = "$cmMajor.$cmMinor.$cmPatch"
+          if ($vCmake -ne $tagVersion) {
+            Write-Host "::error::CMakeLists.txt: $vCmake (expected $tagVersion)"
+            $failed = $true
+          } else {
+            Write-Host "CMakeLists.txt: $vCmake"
+          }
+
+          # 3. vcpkg.json
+          $vcpkg = Get-Content vcpkg.json -Raw
+          if ($vcpkg -match '"version-string"\s*:\s*"(\d+\.\d+\.\d+)"') {
+            $vVcpkg = $matches[1]
+          }
+          if ($vVcpkg -ne $tagVersion) {
+            Write-Host "::error::vcpkg.json: $vVcpkg (expected $tagVersion)"
+            $failed = $true
+          } else {
+            Write-Host "vcpkg.json: $vVcpkg"
+          }
+
+          # 4. version.rc
+          $vrc = Get-Content version.rc -Raw
+          if ($vrc -match '"FileVersion",\s*"(\d+\.\d+\.\d+)') {
+            $vRc = $matches[1]
+          }
+          if ($vRc -ne $tagVersion) {
+            Write-Host "::error::version.rc: $vRc (expected $tagVersion)"
+            $failed = $true
+          } else {
+            Write-Host "version.rc: $vRc"
+          }
+
+          if ($failed) {
+            Write-Host ""
+            Write-Error "Version mismatch detected! Update all version files before preparing release."
+            exit 1
+          }
+
+          Write-Host ""
+          Write-Host "All version files consistent: $tagVersion"
+
+      - name: Extract changelog
+        shell: bash
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+
+          if [ ! -f "docs/CHANGELOG.md" ]; then
+            echo "::error::docs/CHANGELOG.md not found"
+            exit 1
+          fi
+
+          # Extract section for this version
+          NOTES=$(awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "["ver"]")) found=1
+            }
+            found && !/^## \[/ { print }
+          ' docs/CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            echo "::error::No changelog entry for version ${VERSION}"
+            echo "::error::Add a ## [${VERSION}] section to docs/CHANGELOG.md"
+            exit 1
+          fi
+
+          # Save for commit message
+          {
+            echo "Release v${VERSION}"
+            echo ""
+            echo "$NOTES"
+          } > /tmp/commit_msg.txt
+
+          echo "Changelog entry found for ${VERSION}"
+
+      - name: Stage public content
+        shell: bash
+        run: |
+          STAGING="staging"
+          mkdir -p "$STAGING"
+
+          # === WHITELIST: Only these paths go public ===
+          cp README.md "$STAGING/"
+          cp LICENSE "$STAGING/"
+          cp CMakeLists.txt "$STAGING/"
+          cp CMakePresets.json "$STAGING/"
+          cp vcpkg.json "$STAGING/"
+          cp version.rc "$STAGING/"
+          cp .gitignore "$STAGING/"
+
+          cp -r src "$STAGING/"
+          cp -r include "$STAGING/"
+          cp -r docs "$STAGING/"
+
+          # Add dist/ when it has content
+          if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
+            cp -r dist "$STAGING/"
+          fi
+
+          mkdir -p "$STAGING/.github/workflows"
+          cp .github/workflows/release.yml "$STAGING/.github/workflows/"
+          # === END WHITELIST ===
+
+          echo "Staged content for release"
+          find "$STAGING" -type f | wc -l | xargs echo "Total files:"
+
+      - name: Validate no private content in staging
+        shell: bash
+        run: |
+          cd staging
+          FAILED=0
+
+          # Path checks
+          for path in .private CLAUDE.md .mcp.json; do
+            if [ -e "$path" ]; then
+              echo "::error::LEAK: $path in staging"
+              FAILED=1
+            fi
+          done
+
+          # PII scan
+          if grep -rli "Mark Cassidy" --include="*.md" --include="*.txt" --include="*.json" --include="*.yml" --include="*.ini" --include="*.cpp" --include="*.h" . 2>/dev/null; then
+            echo "::error::PII found in staging"
+            FAILED=1
+          fi
+
+          # Secret patterns
+          if grep -rE "gh[pousr]_[a-zA-Z0-9]{36,}" --include="*.md" --include="*.txt" --include="*.json" --include="*.yml" . 2>/dev/null; then
+            echo "::error::GitHub token pattern in staging"
+            FAILED=1
+          fi
+
+          if [ $FAILED -eq 1 ]; then
+            echo "::error::Private content leaked into staging - aborting"
+            exit 1
+          fi
+
+          echo "No private content detected in staging"
+
+      - name: Create release branch
+        shell: bash
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          BRANCH="releases/review/${VERSION}"
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create orphan branch
+          git checkout --orphan "$BRANCH"
+          git rm -rf . > /dev/null 2>&1 || true
+
+          # Copy staged content (not the staging directory itself)
+          cp -r staging/* .
+          cp staging/.gitignore .
+          mkdir -p .github/workflows
+          cp -r staging/.github/workflows/* .github/workflows/
+
+          # Remove the staging directory from the working tree
+          rm -rf staging
+
+          # Commit with changelog
+          git add -A
+          git commit -F /tmp/commit_msg.txt
+
+          # Push branch (force to allow re-running)
+          git push origin "$BRANCH" --force
+
+          echo ""
+          echo "=========================================="
+          echo "Release branch created: $BRANCH"
+          echo "Review at: https://github.com/${{ github.repository }}/tree/$BRANCH"
+          echo "=========================================="
+          echo ""
+          if [ "${{ inputs.skip_build }}" == "true" ]; then
+            echo "Build verification SKIPPED (skip_build=true)"
+            echo "Re-run without skip_build before publishing!"
+          else
+            echo "Build verification starting next..."
+          fi
+
+      - name: Checkout release branch for build
+        if: ${{ !inputs.skip_build }}
+        uses: actions/checkout@v4
+        with:
+          ref: releases/review/${{ github.event.inputs.version }}
+          clean: true
+
+      - name: Clone vcpkg
+        if: ${{ !inputs.skip_build }}
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.bat
+
+      - name: Configure CMake
+        if: ${{ !inputs.skip_build }}
+        run: cmake --preset release
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+
+      - name: Build DLL
+        if: ${{ !inputs.skip_build }}
+        run: cmake --build build/release --config Release
+
+      - name: Verify DLL built
+        if: ${{ !inputs.skip_build }}
+        shell: bash
+        run: |
+          if [ ! -f "build/release/Release/OHUI.dll" ]; then
+            echo "::error::DLL build failed - release content does not compile"
+            exit 1
+          fi
+          echo "DLL built successfully"
+
+      - name: Build verification complete
+        if: ${{ !inputs.skip_build }}
+        shell: bash
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "BUILD VERIFIED"
+          echo ""
+          echo "Release branch: releases/review/${{ github.event.inputs.version }}"
+          echo "  - DLL compiles successfully"
+          echo ""
+          echo "Next steps:"
+          echo "  1. Review branch content"
+          echo "  2. Run 'Publish Release' workflow when satisfied"
+          echo "=========================================="

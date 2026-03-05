@@ -1,0 +1,157 @@
+# Publish a prepared release to the public repository
+#
+# Prerequisites:
+# - releases/review/X.Y.Z branch exists (created by Prepare Release workflow)
+# - You have reviewed the branch and are satisfied
+# - Prepare Release workflow build succeeded
+#
+# This pushes the release branch content to the public repo and tags it,
+# triggering the public repo's release.yml to build and create the GitHub release.
+# After successful publish, renames the branch to releases/X.Y.Z in private repo.
+
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.0, without v prefix)'
+        required: true
+
+permissions:
+  contents: write  # Required to rename branch in private repo
+
+env:
+  PUBLIC_REPO: ohfor/ohui
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format. Use X.Y.Z (e.g., 1.0.0)"
+            exit 1
+          fi
+
+      - name: Checkout review branch
+        uses: actions/checkout@v4
+        with:
+          ref: releases/review/${{ github.event.inputs.version }}
+          path: release
+          fetch-depth: 0
+
+      - name: Verify review branch exists and has content
+        run: |
+          if [ ! -d "release/src" ]; then
+            echo "::error::Review branch releases/review/${{ github.event.inputs.version }} not found or empty"
+            echo "::error::Run 'Prepare Release' workflow first"
+            exit 1
+          fi
+          echo "Review branch verified"
+
+      - name: Checkout public repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PUBLIC_REPO }}
+          path: public
+          token: ${{ secrets.PUBLIC_REPO_PAT }}
+          fetch-depth: 0
+
+      - name: Extract release notes
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+
+          if [ ! -f "release/docs/CHANGELOG.md" ]; then
+            echo "::error::docs/CHANGELOG.md not found in release branch"
+            exit 1
+          fi
+
+          NOTES=$(awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "["ver"]")) found=1
+            }
+            found && !/^## \[/ { print }
+          ' release/docs/CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            echo "::error::No changelog entry for version $VERSION"
+            exit 1
+          fi
+
+          echo "$NOTES" > /tmp/release_notes.md
+          echo "Release notes extracted"
+
+      - name: Sync release content to public repo
+        run: |
+          # Clear public repo (except .git)
+          cd public
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cd ..
+
+          # Copy release branch content (exclude .git)
+          cp -r release/* public/
+          cp release/.gitignore public/ 2>/dev/null || true
+          mkdir -p public/.github/workflows
+          cp -r release/.github/workflows/* public/.github/workflows/
+
+          echo "Content synced to public repo"
+
+      - name: Commit and push to public repo
+        run: |
+          cd public
+          VERSION="v${{ github.event.inputs.version }}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit - public repo already up to date"
+          else
+            # Commit with release notes
+            {
+              echo "Release ${VERSION}"
+              echo ""
+              cat /tmp/release_notes.md
+            } > /tmp/commit_msg.txt
+
+            git commit -F /tmp/commit_msg.txt
+          fi
+
+          # Tag (will fail if tag exists - that's intentional)
+          git tag -a "${VERSION}" -m "Release ${VERSION}"
+
+          # Push
+          git push origin main
+          git push origin "${VERSION}"
+
+          echo ""
+          echo "=========================================="
+          echo "PUBLISHED: ${VERSION}"
+          echo ""
+          echo "Public repo: https://github.com/${{ env.PUBLIC_REPO }}"
+          echo "Release workflow triggered - builds and creates GitHub release"
+          echo "=========================================="
+
+      - name: Rename review branch to releases/X.Y.Z
+        run: |
+          cd release
+          VERSION="${{ github.event.inputs.version }}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create the final release branch name
+          git branch -m "releases/${VERSION}"
+
+          # Push the renamed branch and delete the review branch
+          git push origin "releases/${VERSION}" --force
+          git push origin --delete "releases/review/${VERSION}" || true
+
+          echo "Branch renamed: releases/review/${VERSION} -> releases/${VERSION}"

@@ -1,0 +1,12 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+    "name": "ohui",
+    "version-string": "1.0.0",
+    "description": "OHUI - Complete UI framework for Skyrim SE/AE/VR",
+    "license": "MIT",
+    "builtin-baseline": "66c0373dc7fca549e5803087b9487edfe3aca0a1",
+    "dependencies": [
+        "spdlog",
+        "xbyak"
+    ]
+}
