@@ -668,13 +668,40 @@ Components are the building blocks for all screens.
 
 ---
 
+### TASK-049 · Icon System
+
+**What:** Icon atlas loading, keyword-to-icon resolution mapping,
+and skin atlas replacement.
+
+**Start state:** TASK-027 (renderer bridge) complete.
+
+**End state:** OHUI loads a first-party icon atlas covering all
+vanilla and DLC item types, spell schools, perk icons, shout icons,
+status indicators (stolen, quest, enchanted, favourited), and UI
+chrome. Keyword-to-icon resolution maps item/spell properties to
+atlas entries automatically. Skin authors can ship replacement
+atlases. Resolution is fast enough for list scrolling with thousands
+of items.
+
+**Definition of done:**
+- Vanilla sword resolves to weapon icon via standard keywords
+- DLC item resolves to correct icon
+- Mod-added item using standard keywords resolves automatically
+- Skin replacement atlas overrides all default icons
+- Resolution of 1000 items completes within one frame
+
+**Reference:** `systems/icon-system.md`
+
+---
+
 ### TASK-050A · Atom Layer and Token Implementation
 
 **What:** Implement the atom layer (Text, Rectangle, Line, Icon,
 Image, Viewport primitives) and the full token set (colour, spacing,
 typography, shape) as defined in `systems/component-library.md`.
 
-**Start state:** TASK-027 (renderer bridge) complete.
+**Start state:** TASK-027 (renderer bridge) and TASK-049 (icon
+system) complete.
 
 **End state:** All 6 atom types render correctly via the renderer
 bridge. All token categories loaded from USS and resolvable. Skin
@@ -1626,6 +1653,42 @@ list. Player can take items directly. Dismisses on look-away.
 
 ---
 
+### TASK-109 · Quest Tracker Widget
+
+**What:** Active quest objective display as a first-party HUD widget.
+
+**Start state:** TASK-050B, TASK-014 complete.
+
+**End state:** Widget shows active quest objectives on the HUD.
+Multiple active quests supported. Updates when objectives change.
+Participates in edit mode.
+
+**Definition of done:**
+- Active quest objectives visible on HUD
+- Objective completes — updates immediately
+- Multiple tracked quests shown simultaneously
+- Participates in edit mode
+
+---
+
+### TASK-109B · Recent Loot Widget
+
+**What:** Compact visual feed of items just picked up.
+
+**Start state:** TASK-050B, TASK-049 (icon system), TASK-014 complete.
+
+**End state:** Widget shows a feed of recently acquired items with
+icon, name, and quantity. Entries appear on pickup and auto-fade
+after a configurable duration. Stacks identical items.
+
+**Definition of done:**
+- Pick up item — entry appears with icon and name
+- Pick up 5 of same item — single entry with ×5
+- Entries fade after configured duration
+- Participates in edit mode
+
+---
+
 ## Dependency Graph (summary)
 
 ```
@@ -1641,7 +1704,7 @@ Phase 0 (TASK-001–005)
   ├── Phase 3 (TASK-025–028)  ← DSL runtime
   │     ├── Phase 6 (merges here — components need DSL)
   │     ├── Phase 8 (TASK-075–077)  ← message log
-  │     └── Phase 13 (TASK-100–108)  ← first-party HUD widgets
+  │     └── Phase 13 (TASK-100–109B)  ← first-party HUD widgets
   │
   ├── Phase 4 (TASK-030–033)  ← MCM compat
   │     └── Phase 5 (TASK-040–043)  ← MCM2 native
@@ -1702,6 +1765,13 @@ Each blocks or affects specific tasks.
 7. **Tween menu secondary slot access** — hold-vs-tap or sub-menu
    for secondary directions. Affects TASK-068 interaction design.
    *Source: tween-menu.md*
+
+8. **Icon atlas format — SkyUI compatibility vs clean break** —
+   SkyUI's icon system uses a specific atlas format and keyword
+   mapping. Adopting the same format enables compatibility with
+   mods that ship SkyUI icon patches. Defining a new format is
+   cleaner but breaks existing icon mods. Affects TASK-049.
+   *Source: icon-system.md*
 
 ---
 
