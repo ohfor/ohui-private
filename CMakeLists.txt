@@ -96,6 +96,7 @@ set(CORE_SOURCES
     src/mcm/MCMCallbackEngine.cpp
     src/mcm/MCMListManager.cpp
     src/mcm/MCM2DefinitionParser.cpp
+    src/mcm/MCM2ConditionEngine.cpp
     # Each task appends here
 )
 
@@ -144,6 +145,8 @@ set(CORE_HEADERS
     include/ohui/mcm/MCMListManager.h
     include/ohui/mcm/MCM2Types.h
     include/ohui/mcm/MCM2DefinitionParser.h
+    include/ohui/mcm/MCM2ConditionTypes.h
+    include/ohui/mcm/MCM2ConditionEngine.h
     # Each task appends here
 )
 

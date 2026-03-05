@@ -28,6 +28,7 @@ enum class ErrorCode {
     OptionNotFound,
     PageNotFound,
     InvalidState,
+    CircularReference,
 };
 
 struct Error {
