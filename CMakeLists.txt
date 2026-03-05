@@ -113,6 +113,9 @@ set(CORE_SOURCES
     src/dsl/handlers/ContainerHandlers.cpp
     src/dsl/handlers/NavigationHandlers.cpp
     src/dsl/handlers/InputHandlers.cpp
+    src/dsl/handlers/IndicatorHandlers.cpp
+    src/dsl/handlers/MediaHandlers.cpp
+    src/dsl/handlers/ListHandlers.cpp
     # Each task appends here
 )
 

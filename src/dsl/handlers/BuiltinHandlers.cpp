@@ -5,6 +5,9 @@
 #include "ContainerHandlers.h"
 #include "NavigationHandlers.h"
 #include "InputHandlers.h"
+#include "IndicatorHandlers.h"
+#include "MediaHandlers.h"
+#include "ListHandlers.h"
 
 #include <algorithm>
 #include <cmath>
@@ -45,6 +48,18 @@ void ComponentRegistry::RegisterBuiltins() {
     Register("Dropdown", std::make_unique<DropdownHandler>());
     Register("Stepper", std::make_unique<StepperHandler>());
     Register("ContextMenu", std::make_unique<ContextMenuHandler>());
+    Register("StatusBadge", std::make_unique<StatusBadgeHandler>());
+    Register("IndicatorDot", std::make_unique<IndicatorDotHandler>());
+    Register("AlertBanner", std::make_unique<AlertBannerHandler>());
+    Register("CompletionRing", std::make_unique<CompletionRingHandler>());
+    Register("Portrait", std::make_unique<PortraitHandler>());
+    Register("CharacterViewport", std::make_unique<CharacterViewportHandler>());
+    Register("SceneViewport", std::make_unique<SceneViewportHandler>());
+    Register("MapViewport", std::make_unique<MapViewportHandler>());
+    Register("ListEntry", std::make_unique<ListEntryHandler>());
+    Register("ListEntryCompact", std::make_unique<ListEntryCompactHandler>());
+    Register("ScrollList", std::make_unique<ScrollListHandler>());
+    Register("FacetedList", std::make_unique<FacetedListHandler>());
 }
 
 // --- PanelHandler ---
