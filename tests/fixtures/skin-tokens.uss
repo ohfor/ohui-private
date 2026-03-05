@@ -1,0 +1,4 @@
+:root {
+    --color-primary: #0000ff;
+    --color-accent: #ff00ff;
+}

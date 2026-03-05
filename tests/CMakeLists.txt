@@ -6,7 +6,7 @@ set(TEST_SOURCES
     CosaveTests.cpp
     USSParserTests.cpp
     PersistenceTests.cpp
-    # Each task appends here
+    TokenStoreTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
