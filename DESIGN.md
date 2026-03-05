@@ -256,6 +256,8 @@ OHUI is independent infrastructure. Both projects benefit directly:
 - `systems/mod-registration-api.md` — mod integration model (engine reads, frozen giants, widget registration).
 - `systems/cosave-persistence.md` — cosave format, persistence API, lifecycle.
 - `systems/message-log.md` — unified message log system.
+- `systems/actor-viewport.md` — clone-based actor rendering for dialogue, inventory, and load game.
+- `systems/outfit-system.md` — named equipment sets for player and followers.
 - `systems/new-game-plus.md` — PARKED. New Game+ feature, isolated pending further design.
 
 **Screens:**

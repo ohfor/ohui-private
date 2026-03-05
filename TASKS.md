@@ -222,20 +222,40 @@ drag and resize, auto-save on exit.
 **Start state:** TASK-010, TASK-011, TASK-012 complete.
 
 **End state:** Edit mode triggered by a dedicated keybind. On entry:
-game pauses (configurable), all widgets gain bounding box chrome
-(dotted outline, label, resize handles). Player can drag widgets
-to new positions and drag resize handles to new sizes. On exit:
-layout auto-saved to active profile. Chrome removed. Game resumes.
+game slows to configurable timescale (default 10%), all widgets gain
+bounding box chrome (dotted outline, title bar, resize handles). Player
+can drag widgets to new positions and drag resize handles to new sizes.
+Context menu on right-click (or controller context button) exposes per-
+widget settings: skin selection, display mode (always/as-needed/hide),
+scale, opacity, opacity-out-of-combat, reset position, reset all.
+Widget-specific settings appear in a labelled section. Multi-select
+(Shift+click, LB+A on controller) allows moving multiple widgets
+together. Full undo/redo history for the edit session. Global toolbar:
+save as preset, load preset, reset all to defaults, toggle snap,
+grid size. Controller fully navigable (D-pad fine move, LB/RB cycle
+widgets, LT/RT resize, X context menu, Y global toolbar). Distribute
+evenly action for multi-selected widgets. On exit: layout auto-saved
+to active profile. Chrome removed. Game resumes.
 
 **Definition of done:**
 - Drag moves widget to new position, position persists after reload
 - Resize changes widget size within min/max constraints, persists
-- Snap-to-grid optional (off by default), when on widgets snap to
-  nearest 8px grid
+- Snap-to-grid configurable (fine/medium/coarse/custom px), widgets
+  snap to grid, edge snap to other widgets and screen edges, centre
+  line snap functional
+- Context menu opens on right-click, all universal settings functional
+- Multi-select: Shift+click adds to selection, group move works
+- Undo/Redo: Ctrl+Z undoes last action, Ctrl+Y redoes, full session
+  history
+- Save as preset: prompts for name, saves current layout
+- Load preset: replaces layout (with confirmation), saves undo state
+- Controller: all edit mode operations achievable without mouse
+- Distribute: multi-selected widgets distribute evenly on chosen axis
 - Exit saves layout to active profile immediately
 - Widget cannot be dragged outside the canvas bounds
 
-**Reference:** `systems/hud-widget-runtime.md` § Edit Mode
+**Reference:** `systems/hud-widget-runtime.md` § Edit Mode,
+`screens/edit-mode.md`
 
 ---
 
@@ -448,6 +468,46 @@ viewport differ.
 
 **Reference:** `systems/hud-widget-runtime.md` § Non-Scaleform Overlays,
 `systems/dsl-and-skinning.md` § Rendering Paths
+
+---
+
+### TASK-029 · Actor Viewport
+
+**What:** Clone-based actor rendering system — isolated rendering of
+a specific actor (player or NPC) in a controlled environment, used by
+dialogue, inventory, and load game screens.
+
+**Start state:** TASK-027 (renderer bridge) complete.
+
+**End state:** OHUI can render an actor clone in an isolated environment
+with consistent lighting, independent of the game world's cell, weather,
+and time of day. The clone inherits the source actor's current appearance
+(equipment, body, face, appearance mods) but exists separately — changes
+to the clone do not affect the source actor. Framing modes (head and
+shoulders, half body, full body, custom) select camera parameters.
+Lighting presets (neutral, warm, cool, dramatic) available. Update rate
+modes: static (render once), on-change (re-render on appearance change),
+continuous (configurable rate, default ~20fps). Equipment preview applies
+items to the clone only. Preview throttling with dwell timer (150–200ms)
+prevents excessive asset loading during rapid list navigation. Maximum 2
+simultaneous viewports. Viewports idle >30s are suspended. Viewports
+released on screen close. Absence handling: if clone creation fails,
+viewport returns nothing and requesting screen collapses the area
+gracefully.
+
+**Definition of done:**
+- Render player character clone in isolated environment — correct
+  appearance, equipment, and visual mods reflected
+- Head-and-shoulders framing mode positions camera correctly
+- Full-body framing mode positions camera correctly
+- Equipment preview: apply item to clone, confirm source actor unchanged
+- Preview throttling: rapid cursor movement does not trigger preview loads
+- Two simultaneous viewports active without error
+- Third viewport request returns nothing gracefully
+- Idle viewport suspends after 30 seconds, resumes on access
+- Viewport released when requesting screen closes
+
+**Reference:** `systems/actor-viewport.md`
 
 ---
 
@@ -807,8 +867,8 @@ slides in/out with animation.
 **What:** StatusBadge, IndicatorDot, AlertBanner, CompletionRing,
 Portrait, CharacterViewport, SceneViewport, MapViewport.
 
-**Start state:** TASK-050A complete. TASK-028 (viewport contract) for
-media viewport components.
+**Start state:** TASK-050A complete. TASK-028 (viewport contract) and
+TASK-029 (actor viewport) for media viewport components.
 
 **End state:** All indicator components render with correct tokens.
 Media viewport components render into viewport contract surfaces.
@@ -881,7 +941,7 @@ require TASK-050C.
 
 ### TASK-051 · Inventory Screen
 
-**Start state:** TASK-050C complete.
+**Start state:** TASK-050C, TASK-029 (actor viewport) complete.
 **End state:** Inventory screen fully functional with FacetedList,
 item detail panel, sort controls, all item categories, and all
 item action verbs (equip, drop, favourite, inspect).
@@ -996,7 +1056,7 @@ a perk to its prerequisite and back.
 
 ### TASK-059 · Dialogue Screen
 
-**Start state:** Phase 6, Phase 2 complete.
+**Start state:** Phase 6, Phase 2, TASK-029 (actor viewport) complete.
 **End state:** Topic list, subtitles, speaker attribution, full
 sentence preview option. Speaker portrait (real-or-nothing — render
 if available, omit gracefully if not).
@@ -1068,8 +1128,8 @@ rename persists after reload.
 
 ### TASK-064 · Portrait Capture
 
-**Start state:** TASK-062 (load game screen) complete. TASK-012
-(data binding, character state accessible) complete.
+**Start state:** TASK-062 (load game screen), TASK-029 (actor viewport),
+TASK-012 (data binding, character state accessible) complete.
 **End state:** At every save event, OHUI renders a 512×512 portrait
 of the player character in a neutral pose with three-point lighting.
 Captured texture compressed and stored in cosave. Load game screen
@@ -1793,7 +1853,7 @@ Phase 0 (TASK-001–005)
   │     │
   │     └── Phase 9 (TASK-085–086)  ← mod integration (widget + binding registration)
   │
-  ├── Phase 3 (TASK-025–028)  ← DSL runtime
+  ├── Phase 3 (TASK-025–029)  ← DSL runtime + actor viewport
   │     ├── Phase 6 (merges here — components need DSL)
   │     ├── Phase 8 (TASK-075–077)  ← message log
   │     └── Phase 14 (TASK-100–109B)  ← first-party HUD widgets
@@ -1867,6 +1927,11 @@ Each blocks or affects specific tasks.
    mods that ship SkyUI icon patches. Defining a new format is
    cleaner but breaks existing icon mods. Affects TASK-049.
    *Source: icon-system.md*
+
+**Note:** This section captures architectural-level design blockers.
+Individual system and screen documents contain additional open questions
+specific to their scope (see the "Open Questions" section in each
+document). Those are resolved as part of the relevant task.
 
 ---
 
