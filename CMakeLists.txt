@@ -85,6 +85,7 @@ set(CORE_SOURCES
     src/widget/MultiSelectState.cpp
     src/widget/EditSession.cpp
     src/binding/BindingSchema.cpp
+    src/input/InputContextStack.cpp
     # Each task appends here
 )
 
@@ -115,6 +116,9 @@ set(CORE_HEADERS
     include/ohui/widget/MultiSelectState.h
     include/ohui/widget/EditSession.h
     include/ohui/binding/BindingSchema.h
+    include/ohui/input/InputTypes.h
+    include/ohui/input/InputContext.h
+    include/ohui/input/InputContextStack.h
     # Each task appends here
 )
 

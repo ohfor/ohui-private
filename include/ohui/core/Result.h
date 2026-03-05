@@ -20,6 +20,7 @@ enum class ErrorCode {
     ProfileNotFound,
     EditModeNotActive,
     InvalidNamespace,
+    ContextNotFound,
 };
 
 struct Error {
