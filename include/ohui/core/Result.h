@@ -14,6 +14,7 @@ enum class ErrorCode {
     ChecksumMismatch,
     IOError,
     NotRegistered,
+    WidgetNotFound,
 };
 
 struct Error {

@@ -77,6 +77,7 @@ set(CORE_SOURCES
     src/dsl/USSParser.cpp
     src/dsl/TokenStore.cpp
     src/layout/YogaWrapper.cpp
+    src/widget/WidgetRegistry.cpp
     # Each task appends here
 )
 
@@ -94,6 +95,8 @@ set(CORE_HEADERS
     include/ohui/dsl/USSParser.h
     include/ohui/dsl/TokenStore.h
     include/ohui/layout/YogaWrapper.h
+    include/ohui/widget/WidgetTypes.h
+    include/ohui/widget/WidgetRegistry.h
     # Each task appends here
 )
 
