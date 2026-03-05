@@ -23,7 +23,7 @@ Loads the most recent save. Nothing exotic.
 ## Load Game
 
 The two-tier character gallery and save browser. See
-`screens/load-game.md` for the full specification. Players first select
+`load-game.md` for the full specification. Players first select
 a character from a card gallery, then browse that character's save
 history with rich per-entry metadata. Mod list delta indicator flags
 saves made with a different mod list — honest warning, not a blocker.

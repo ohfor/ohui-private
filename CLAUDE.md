@@ -116,8 +116,6 @@ Version bumps happen ONLY when preparing a Nexus release, not after every featur
 | `docs/` | Public documentation (Build, Architecture, Changelog) |
 | `dist/` | Nexus archive layout (game data files shipped to users) |
 | `assets/` | Release archives (versioned zips for Nexus upload) |
-| `screens/` | 17 screen design docs (inventory, dialogue, skills, etc.) |
-| `systems/` | 16 system architecture docs (DSL, data binding, MCM, etc.) |
 
 ## Log Location
 
@@ -167,6 +165,8 @@ Overrides should be deleted when they no longer apply (reference caught up, reas
 | `.private/decisions/` | Architectural decision records for this project |
 | `.private/notes/` | Session notes, scratch thinking, temporary context |
 | `.private/research/` | Investigation logs, disassembly analysis, dead-end documentation |
+| `.private/screens/` | 17 screen design docs (inventory, dialogue, skills, etc.) |
+| `.private/systems/` | 16 system architecture docs (DSL, data binding, MCM, etc.) |
 
 ## Reference Docs
 

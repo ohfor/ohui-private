@@ -216,13 +216,13 @@ The public API is a projection of the DSL — the same concepts the DSL expresse
 accessible programmatically. It is documented once the DSL design has stabilised.
 
 The known integration seams are covered in their respective systems documents:
-- Widget viewport contract → `systems/hud-widget-runtime.md`
-- Data binding schema interface → `systems/dsl-and-skinning.md`
-- Input action registration → `systems/input-handling.md`
-- MCM compatibility shim → `systems/mcm2.md`
-- MCM2 declarative config → `systems/mcm2.md`
-- Mod integration model → `systems/mod-registration-api.md`
-- Cosave / persistence → `systems/cosave-persistence.md`
+- Widget viewport contract → `.private/systems/hud-widget-runtime.md`
+- Data binding schema interface → `.private/systems/dsl-and-skinning.md`
+- Input action registration → `.private/systems/input-handling.md`
+- MCM compatibility shim → `.private/systems/mcm2.md`
+- MCM2 declarative config → `.private/systems/mcm2.md`
+- Mod integration model → `.private/systems/mod-registration-api.md`
+- Cosave / persistence → `.private/systems/cosave-persistence.md`
 
 ---
 
@@ -240,41 +240,41 @@ OHUI is independent infrastructure. Both projects benefit directly:
 
 **Top-level:**
 - `DESIGN.md` — this document. Vision, principles, architecture overview.
-- `compatibility.md` — soft dependency philosophy, graceful degradation, frozen giants.
-- `mod-compatibility-checklist.md` — specific mod compatibility status.
+- `.private/compatibility.md` — soft dependency philosophy, graceful degradation, frozen giants.
+- `.private/mod-compatibility-checklist.md` — specific mod compatibility status.
 
 **Systems:**
-- `systems/hud-widget-runtime.md` — widget canvas, edit mode, widget contract.
-- `systems/component-library.md` — full component and token library.
-- `systems/dsl-and-skinning.md` — DSL, USS/Yoga, rendering paths, skin system.
-- `systems/data-binding-schema.md` — named binding catalogue, poll sources, custom bindings.
-- `systems/input-handling.md` — context stack, action binding, button prompts.
-- `systems/localisation.md` — string format, pluralisation, RTL, font system.
-- `systems/performance-model.md` — update modes, dirty flagging.
-- `systems/mcm2.md` — MCM compatibility layer and declarative native API.
-- `systems/icon-system.md` — item/spell/perk/status icon resolution and atlases.
-- `systems/mod-registration-api.md` — mod integration model (engine reads, frozen giants, widget registration).
-- `systems/cosave-persistence.md` — cosave format, persistence API, lifecycle.
-- `systems/message-log.md` — unified message log system.
-- `systems/actor-viewport.md` — clone-based actor rendering for dialogue, inventory, and load game.
-- `systems/outfit-system.md` — named equipment sets for player and followers.
-- `systems/new-game-plus.md` — PARKED. New Game+ feature, isolated pending further design.
+- `.private/systems/hud-widget-runtime.md` — widget canvas, edit mode, widget contract.
+- `.private/systems/component-library.md` — full component and token library.
+- `.private/systems/dsl-and-skinning.md` — DSL, USS/Yoga, rendering paths, skin system.
+- `.private/systems/data-binding-schema.md` — named binding catalogue, poll sources, custom bindings.
+- `.private/systems/input-handling.md` — context stack, action binding, button prompts.
+- `.private/systems/localisation.md` — string format, pluralisation, RTL, font system.
+- `.private/systems/performance-model.md` — update modes, dirty flagging.
+- `.private/systems/mcm2.md` — MCM compatibility layer and declarative native API.
+- `.private/systems/icon-system.md` — item/spell/perk/status icon resolution and atlases.
+- `.private/systems/mod-registration-api.md` — mod integration model (engine reads, frozen giants, widget registration).
+- `.private/systems/cosave-persistence.md` — cosave format, persistence API, lifecycle.
+- `.private/systems/message-log.md` — unified message log system.
+- `.private/systems/actor-viewport.md` — clone-based actor rendering for dialogue, inventory, and load game.
+- `.private/systems/outfit-system.md` — named equipment sets for player and followers.
+- `.private/systems/new-game-plus.md` — PARKED. New Game+ feature, isolated pending further design.
 
 **Screens:**
-- `screens/inventory-barter-container.md`
-- `screens/magic-spells-shouts.md`
-- `screens/crafting.md`
-- `screens/map.md`
-- `screens/quest-journal.md`
-- `screens/skills.md`
-- `screens/dialogue.md`
-- `screens/wait-sleep.md`
-- `screens/level-up.md`
-- `screens/stats.md`
-- `screens/tween-menu.md`
-- `screens/loading-screen.md`
-- `screens/main-menu.md`
-- `screens/load-game.md`
-- `screens/gift-menu.md`
-- `screens/favourites-radial.md`
-- `screens/edit-mode.md`
+- `.private/screens/inventory-barter-container.md`
+- `.private/screens/magic-spells-shouts.md`
+- `.private/screens/crafting.md`
+- `.private/screens/map.md`
+- `.private/screens/quest-journal.md`
+- `.private/screens/skills.md`
+- `.private/screens/dialogue.md`
+- `.private/screens/wait-sleep.md`
+- `.private/screens/level-up.md`
+- `.private/screens/stats.md`
+- `.private/screens/tween-menu.md`
+- `.private/screens/loading-screen.md`
+- `.private/screens/main-menu.md`
+- `.private/screens/load-game.md`
+- `.private/screens/gift-menu.md`
+- `.private/screens/favourites-radial.md`
+- `.private/screens/edit-mode.md`

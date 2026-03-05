@@ -29,7 +29,7 @@ rectangles for each node. No rendering. Layout only.
   constraints, padding, margin all produce correct geometry
 - MIT licence notice for Yoga present in project
 
-**Reference:** `systems/dsl-and-skinning.md` § Yoga
+**Reference:** `.private/systems/dsl-and-skinning.md` § Yoga
 
 ---
 
@@ -50,12 +50,12 @@ Parsing only.
 **Definition of done:**
 - Parses all standard USS visual properties
 - Parses all `-ohui-` extension properties listed in
-  `systems/dsl-and-skinning.md`
+  `.private/systems/dsl-and-skinning.md`
 - Rejects unknown properties with a warning log, continues parsing
 - Unit tests cover: selector specificity, cascade order, `var()`
   token resolution, pseudo-class states
 
-**Reference:** `systems/dsl-and-skinning.md` § USS
+**Reference:** `.private/systems/dsl-and-skinning.md` § USS
 
 ---
 
@@ -79,7 +79,7 @@ without touching other tokens.
 - `var(--undefined-token)` logs a warning and returns empty string
 - Unit tests: token resolution, override layering, undefined key handling
 
-**Reference:** `systems/dsl-and-skinning.md` § WPF/XAML as Reference Model
+**Reference:** `.private/systems/dsl-and-skinning.md` § WPF/XAML as Reference Model
 
 ---
 
@@ -106,7 +106,7 @@ created on new game.
 - Migration infrastructure present: versioned migration chain applied
   before reads
 
-**Reference:** `systems/cosave-persistence.md`
+**Reference:** `.private/systems/cosave-persistence.md`
 
 ---
 
@@ -130,7 +130,7 @@ Violations logged, write rejected, no crash.
 - Size limit: oversized write is rejected and logged
 - Papyrus bindings functional and tested via SKSE console
 
-**Reference:** `systems/cosave-persistence.md` § The Persistence API
+**Reference:** `.private/systems/cosave-persistence.md` § The Persistence API
 
 ---
 
@@ -159,7 +159,7 @@ state. No rendering. No data binding. Canvas management only.
 - Duplicate registration logs a warning, does not crash
 - Widget not found on Move/Resize logs a warning, does not crash
 
-**Reference:** `systems/hud-widget-runtime.md`
+**Reference:** `.private/systems/hud-widget-runtime.md`
 
 ---
 
@@ -182,8 +182,8 @@ updated synchronously.
 - Built-in profiles regenerate correctly when cosave is empty
 - Profile not found on load returns false, logs warning, canvas unchanged
 
-**Reference:** `systems/hud-widget-runtime.md` § Layout Profiles,
-`systems/cosave-persistence.md` § Layout Profiles Block
+**Reference:** `.private/systems/hud-widget-runtime.md` § Layout Profiles,
+`.private/systems/cosave-persistence.md` § Layout Profiles Block
 
 ---
 
@@ -209,8 +209,8 @@ both functional. Throttled reactive enforces declared rate.
   second regardless of how frequently the value changes
 - Polling only activates for values with active subscriptions
 
-**Reference:** `systems/performance-model.md`,
-`systems/dsl-and-skinning.md` § Data Binding Schema
+**Reference:** `.private/systems/performance-model.md`,
+`.private/systems/dsl-and-skinning.md` § Data Binding Schema
 
 ---
 
@@ -254,15 +254,15 @@ to active profile. Chrome removed. Game resumes.
 - Exit saves layout to active profile immediately
 - Widget cannot be dragged outside the canvas bounds
 
-**Reference:** `systems/hud-widget-runtime.md` § Edit Mode,
-`screens/edit-mode.md`
+**Reference:** `.private/systems/hud-widget-runtime.md` § Edit Mode,
+`.private/screens/edit-mode.md`
 
 ---
 
 ### TASK-014 · Data Binding Schema Implementation
 
 **What:** Implement the full Skyrim data binding schema — all binding
-IDs defined in `systems/data-binding-schema.md` — with their poll
+IDs defined in `.private/systems/data-binding-schema.md` — with their poll
 sources, types, and poll rates.
 
 **Start state:** TASK-012 complete (data binding engine exists).
@@ -282,7 +282,7 @@ bindings all functional. Poll rates per the schema table.
 - Custom binding registration API functional: a test mod registers
   a custom binding and a test widget reads it
 
-**Reference:** `systems/data-binding-schema.md`
+**Reference:** `.private/systems/data-binding-schema.md`
 
 ---
 
@@ -312,7 +312,7 @@ input simultaneously. Context not found on pop logs a warning.
   unchanged
 - Confirmed: gameplay context at bottom always present
 
-**Reference:** `systems/input-handling.md` § The Input Context Stack
+**Reference:** `.private/systems/input-handling.md` § The Input Context Stack
 
 ---
 
@@ -335,7 +335,7 @@ stored per-character in cosave. Binding map applied at context push
 - Trigger old key after rebind — handler does not fire
 - Papyrus action registration functional
 
-**Reference:** `systems/input-handling.md` § Action-Based Binding
+**Reference:** `.private/systems/input-handling.md` § Action-Based Binding
 
 ---
 
@@ -358,7 +358,7 @@ device type. All visible prompts update.
 - Switch to keyboard input — all prompts switch to key labels
 - Unknown action ID logs warning, renders placeholder
 
-**Reference:** `systems/input-handling.md` § Button Prompts
+**Reference:** `.private/systems/input-handling.md` § Button Prompts
 
 ---
 
@@ -373,7 +373,7 @@ all first-party HUD widgets, and all skin authoring.
 ### TASK-025 · DSL Parser
 
 **What:** Parse `.widget` definition files into a typed AST. The DSL
-syntax defined in `systems/dsl-and-skinning.md`.
+syntax defined in `.private/systems/dsl-and-skinning.md`.
 
 **Start state:** TASK-002 (USS parser) complete.
 
@@ -391,7 +391,7 @@ overrides and optional ControlTemplate.
 - Syntax error produces clear error with file/line/column
 - Unknown component types logged as warning, parse continues
 
-**Reference:** `systems/dsl-and-skinning.md` § The DSL
+**Reference:** `.private/systems/dsl-and-skinning.md` § The DSL
 
 ---
 
@@ -417,7 +417,7 @@ positions and styles). The draw calls are renderer-agnostic.
 - Widget with no bound values renders static content correctly
 - Layout recalculates when widget is resized
 
-**Reference:** `systems/dsl-and-skinning.md` § Rendering Paths
+**Reference:** `.private/systems/dsl-and-skinning.md` § Rendering Paths
 
 ---
 
@@ -441,7 +441,7 @@ any alternative renderer implements this same interface.
 - Icon atlas lookup and tinting functional
 - Skin swap (token override) updates visuals without restart
 
-**Reference:** `systems/dsl-and-skinning.md` § Renderer Abstraction Layer
+**Reference:** `.private/systems/dsl-and-skinning.md` § Renderer Abstraction Layer
 
 ---
 
@@ -466,8 +466,8 @@ viewport differ.
 - Layout profile saves and restores the native widget's position
 - The native widget receives show/hide notifications
 
-**Reference:** `systems/hud-widget-runtime.md` § Non-Scaleform Overlays,
-`systems/dsl-and-skinning.md` § Rendering Paths
+**Reference:** `.private/systems/hud-widget-runtime.md` § Non-Scaleform Overlays,
+`.private/systems/dsl-and-skinning.md` § Rendering Paths
 
 ---
 
@@ -507,7 +507,7 @@ gracefully.
 - Idle viewport suspends after 30 seconds, resumes on access
 - Viewport released when requesting screen closes
 
-**Reference:** `systems/actor-viewport.md`
+**Reference:** `.private/systems/actor-viewport.md`
 
 ---
 
@@ -536,7 +536,7 @@ correct moments. Timing matches SkyUI exactly.
 - Page structure stored and retrievable from Registration State
   Inspector
 
-**Reference:** `systems/mcm2.md` § Compatibility Layer
+**Reference:** `.private/systems/mcm2.md` § Compatibility Layer
 
 ---
 
@@ -568,7 +568,7 @@ Note on naming: SkyUI uses "Menu" (dropdown), "KeyMap" (keybind), and
 The compatibility shim maps SkyUI names to OHUI names transparently.
 MCM2 native API uses OHUI names exclusively.
 
-**Reference:** `systems/mcm2.md` § Control Types, § Callbacks,
+**Reference:** `.private/systems/mcm2.md` § Control Types, § Callbacks,
 § Live Updates
 
 ---
@@ -592,7 +592,7 @@ and most-recently-used sort available as alternatives.
 - Reorder, reload — order preserved
 - "Show hidden" toggle reveals hidden entries
 
-**Reference:** `systems/mcm2.md` § MCM List Management
+**Reference:** `.private/systems/mcm2.md` § MCM List Management
 
 ---
 
@@ -615,7 +615,7 @@ surfaced as filterable channel in the message log.
 - Force callback triggers correctly and fires the handler
 - Refresh registry picks up a mod registered after initial load
 
-**Reference:** `systems/mcm2.md` § Developer and Maintenance Tools
+**Reference:** `.private/systems/mcm2.md` § Developer and Maintenance Tools
 
 ---
 
@@ -644,7 +644,7 @@ logged, parse is rejected, existing definition remains active.
 - Syntax error: logged, rejected, existing definition unchanged
 - Round-trip: parse then serialise produces identical output
 
-**Reference:** `systems/mcm2.md` § Definition Format
+**Reference:** `.private/systems/mcm2.md` § Definition Format
 
 ---
 
@@ -668,7 +668,7 @@ condition sources (e.g. `player.skill.smithing >= 50`).
 - Custom state provider registered and queried correctly
 - Circular condition references detected and logged, not executed
 
-**Reference:** `systems/mcm2.md` § Conditions
+**Reference:** `.private/systems/mcm2.md` § Conditions
 
 ---
 
@@ -691,7 +691,7 @@ for N sessions then pruned.
 - Orphaned entry count decrements each session without matching
   registration, deleted after N sessions
 
-**Reference:** `systems/mcm2.md` § Persistence
+**Reference:** `.private/systems/mcm2.md` § Persistence
 
 ---
 
@@ -717,7 +717,7 @@ mcm id change) detected, logged, flagged in Inspector. No restart.
 - Change control id — logged as destructive, existing value lost,
   new control added with default
 
-**Reference:** `systems/mcm2.md` § Hot Reload
+**Reference:** `.private/systems/mcm2.md` § Hot Reload
 
 ---
 
@@ -750,7 +750,7 @@ of items.
 - Skin replacement atlas overrides all default icons
 - Resolution of 1000 items completes within one frame
 
-**Reference:** `systems/icon-system.md`
+**Reference:** `.private/systems/icon-system.md`
 
 ---
 
@@ -758,7 +758,7 @@ of items.
 
 **What:** Implement the atom layer (Text, Rectangle, Line, Icon,
 Image, Viewport primitives) and the full token set (colour, spacing,
-typography, shape) as defined in `systems/component-library.md`.
+typography, shape) as defined in `.private/systems/component-library.md`.
 
 **Start state:** TASK-027 (renderer bridge) and TASK-049 (icon
 system) complete.
@@ -775,7 +775,7 @@ component-library.md is the shipped default.
 - Image atom renders with fit/fill/stretch modes
 - Token override changes all consuming atoms on next render
 
-**Reference:** `systems/component-library.md` § Token Layer, § Atom Layer
+**Reference:** `.private/systems/component-library.md` § Token Layer, § Atom Layer
 
 ---
 
@@ -795,7 +795,7 @@ and are composable within widget definitions.
 - TimerBar shifts colour at registered thresholds
 - RichText renders inline bold, italic, colour spans
 
-**Reference:** `systems/component-library.md` § Text Components,
+**Reference:** `.private/systems/component-library.md` § Text Components,
 § Value Display Components
 
 ---
@@ -817,7 +817,7 @@ virtualised ScrollList. External facet registration via mod API.
   facet, tapping chip removes that facet
 - External facet registered by a test mod appears in FacetPanel
 
-**Reference:** `systems/component-library.md` § List Components
+**Reference:** `.private/systems/component-library.md` § List Components
 
 ---
 
@@ -837,7 +837,7 @@ keyboard, mouse, and controller. Full OSK support on TextInput.
 - ContextMenu: trigger from list entry, navigate, select, dismiss
 - Stepper: increment, decrement, min/max constraints honoured
 
-**Reference:** `systems/component-library.md` § Navigation Components,
+**Reference:** `.private/systems/component-library.md` § Navigation Components,
 § Input Components
 
 ---
@@ -858,7 +858,7 @@ slides in/out with animation.
 - SplitPanel: draggable divider adjusts ratio
 - Drawer: slides in from edge, slides out on dismiss
 
-**Reference:** `systems/component-library.md` § Container Components
+**Reference:** `.private/systems/component-library.md` § Container Components
 
 ---
 
@@ -879,7 +879,7 @@ CharacterViewport supports rotate/zoom/pan input.
 - CharacterViewport renders player character with camera control
 - Portrait renders NPC bust with fixed framing
 
-**Reference:** `systems/component-library.md` § Indicator Components,
+**Reference:** `.private/systems/component-library.md` § Indicator Components,
 § Media Components
 
 ---
@@ -902,7 +902,7 @@ appear on widget proximity. Grid overlay toggleable.
 - Toolbar shows coordinates and grid snap toggle
 - Grid overlay matches snap increment, toggles on/off
 
-**Reference:** `systems/component-library.md` § Edit Mode Components
+**Reference:** `.private/systems/component-library.md` § Edit Mode Components
 
 ---
 
@@ -927,7 +927,7 @@ renders heading with marker overlay.
 - StealthEye: fills proportionally to detection level
 - NotificationToast: appears, persists, fades on timer
 
-**Reference:** `systems/component-library.md` § Specialised HUD Components
+**Reference:** `.private/systems/component-library.md` § Specialised HUD Components
 
 ---
 
@@ -948,7 +948,7 @@ item action verbs (equip, drop, favourite, inspect).
 **Definition of done:** Player can open inventory, filter by type and
 condition, select and equip an item, drop an item, mark favourite.
 
-**Reference:** `screens/inventory-barter-container.md`
+**Reference:** `.private/screens/inventory-barter-container.md`
 
 ---
 
@@ -960,7 +960,7 @@ Offer panel. Gold/value display. Transaction confirm.
 **Definition of done:** Complete a buy, complete a sell, confirm
 transaction completes correctly with gold updated.
 
-**Reference:** `screens/inventory-barter-container.md`
+**Reference:** `.private/screens/inventory-barter-container.md`
 
 ---
 
@@ -972,7 +972,7 @@ Take All. Transfer individual items. Search across both lists.
 **Definition of done:** Take All works. Individual transfer works
 both directions.
 
-**Reference:** `screens/inventory-barter-container.md`
+**Reference:** `.private/screens/inventory-barter-container.md`
 
 ---
 
@@ -985,7 +985,7 @@ and cooldown state.
 **Definition of done:** Equip spell to both hands, favourite a shout,
 filter by school.
 
-**Reference:** `screens/magic-spells-shouts.md`
+**Reference:** `.private/screens/magic-spells-shouts.md`
 
 ---
 
@@ -1005,7 +1005,7 @@ Temper with quality tier roadmap. Brew a potion with effect matching.
 Enchant with strength preview and naming field. Active effect timer
 visible and draining during fortify buff.
 
-**Reference:** `screens/crafting.md`
+**Reference:** `.private/screens/crafting.md`
 
 ---
 
@@ -1019,7 +1019,7 @@ per quest (stage-implied mechanism for vanilla quests).
 completed quests accessible. Dialogue history shows conversation
 transcripts attributed to correct NPCs.
 
-**Reference:** `screens/quest-journal.md`
+**Reference:** `.private/screens/quest-journal.md`
 
 ---
 
@@ -1033,7 +1033,7 @@ beacons placeable and persistent via cosave.
 place a beacon, fast travel to a known location. Beacon persists
 after save/reload.
 
-**Reference:** `screens/map.md`
+**Reference:** `.private/screens/map.md`
 
 ---
 
@@ -1050,7 +1050,7 @@ prerequisites and dependents. Skill XP bar with exact XP-to-next.
 Perk description shows all ranks and requirements. Navigate from
 a perk to its prerequisite and back.
 
-**Reference:** `screens/skills.md`
+**Reference:** `.private/screens/skills.md`
 
 ---
 
@@ -1063,7 +1063,7 @@ if available, omit gracefully if not).
 **Definition of done:** Complete a branching dialogue tree without
 missing any response options. Speaker name and portrait displayed.
 
-**Reference:** `screens/dialogue.md`
+**Reference:** `.private/screens/dialogue.md`
 
 ---
 
@@ -1077,7 +1077,7 @@ the level, perk point award notification.
 awarded and attribute increased. Impact preview shows before/after
 values for the selected attribute.
 
-**Reference:** `screens/level-up.md`
+**Reference:** `.private/screens/level-up.md`
 
 ---
 
@@ -1092,7 +1092,7 @@ controls, gameplay).
 a new game. Continue loads most recent save. Settings opens. Quit
 exits directly without confirmation.
 
-**Reference:** `screens/main-menu.md`
+**Reference:** `.private/screens/main-menu.md`
 
 ---
 
@@ -1107,7 +1107,7 @@ selected by default.
 cards display with correct name/level/location/portrait. Most recent
 is pre-selected.
 
-**Reference:** `screens/load-game.md`
+**Reference:** `.private/screens/load-game.md`
 
 ---
 
@@ -1122,7 +1122,7 @@ delete (with confirmation).
 delta shows correctly for a save with a missing mod. Manual save
 rename persists after reload.
 
-**Reference:** `screens/load-game.md`
+**Reference:** `.private/screens/load-game.md`
 
 ---
 
@@ -1137,7 +1137,7 @@ reads texture and displays on character card.
 **Definition of done:** Save game, reload — character card shows
 portrait matching character's current appearance and outfit.
 
-**Reference:** `screens/load-game.md`
+**Reference:** `.private/screens/load-game.md`
 
 ---
 
@@ -1152,7 +1152,7 @@ Here). Rest bonus information with live feedback as duration changes.
 and see rest bonus update as duration changes. Danger indicator
 displays appropriate level for current location.
 
-**Reference:** `screens/wait-sleep.md`
+**Reference:** `.private/screens/wait-sleep.md`
 
 ---
 
@@ -1167,7 +1167,7 @@ replacements) remain compatible.
 with skinned bar and tip text. A custom loading screen mod's assets
 display correctly.
 
-**Reference:** `screens/loading-screen.md`
+**Reference:** `.private/screens/loading-screen.md`
 
 ---
 
@@ -1178,7 +1178,7 @@ display correctly.
 **Definition of done:** All vanilla stat categories visible and
 correctly populated.
 
-**Reference:** `screens/stats.md`
+**Reference:** `.private/screens/stats.md`
 
 ---
 
@@ -1193,7 +1193,7 @@ registry, add/remove slots. Slot configuration persisted in cosave.
 destination. Enter edit mode, add MCM as a new slot, reassign a
 slot to a different destination, confirm it persists after reload.
 
-**Reference:** `screens/tween-menu.md`
+**Reference:** `.private/screens/tween-menu.md`
 
 ---
 
@@ -1207,7 +1207,7 @@ groups. Outfit slot type deferred to TASK-115 (outfit integration).
 slots. Equip each from the radial. Potion smart selection picks
 optimal potion from available stock.
 
-**Reference:** `screens/favourites-radial.md`
+**Reference:** `.private/screens/favourites-radial.md`
 
 ---
 
@@ -1219,7 +1219,7 @@ panel, NPC acceptance/rejection feedback.
 **Definition of done:** Open gift menu with a follower, stage items,
 confirm gift. Disposition indicator visible.
 
-**Reference:** `screens/gift-menu.md`
+**Reference:** `.private/screens/gift-menu.md`
 
 ---
 
@@ -1248,7 +1248,7 @@ subtitle intercept, quest update, skill increase, OHUI system.
 - Subscriber with type filter receives only matching messages
 - Stream retains all messages for session duration
 
-**Reference:** `systems/message-log.md` § Architecture
+**Reference:** `.private/systems/message-log.md` § Architecture
 
 ---
 
@@ -1272,7 +1272,7 @@ and subtitle display.
 - Type filter hides/shows message categories
 - Widget participates in edit mode (position, size, visibility)
 
-**Reference:** `systems/message-log.md` § HUD Message Widget
+**Reference:** `.private/systems/message-log.md` § HUD Message Widget
 
 ---
 
@@ -1303,7 +1303,7 @@ Nothing transmitted without explicit player action.
 - Share to GitHub Gist: URL returned and copied to clipboard
 - Share with no network: falls back to raw text clipboard copy
 
-**Reference:** `systems/message-log.md` § Message Log Panel,
+**Reference:** `.private/systems/message-log.md` § Message Log Panel,
 § Share to web
 
 ---
@@ -1337,7 +1337,7 @@ Graceful degradation when no widgets registered.
 - Missing mod ID rejected with warning log
 - Registration outside valid window rejected with warning log
 
-**Reference:** `systems/mod-registration-api.md` § Custom Widgets
+**Reference:** `.private/systems/mod-registration-api.md` § Custom Widgets
 
 ---
 
@@ -1360,7 +1360,7 @@ Graceful empty state when no custom bindings registered.
 - Duplicate key supersedes with warning log
 - No custom bindings registered: all built-in bindings unaffected
 
-**Reference:** `systems/mod-registration-api.md` § Custom Data Bindings
+**Reference:** `.private/systems/mod-registration-api.md` § Custom Data Bindings
 
 ---
 
@@ -1382,7 +1382,7 @@ sets covering Skyrim's 13 languages.
 German strings resolve correctly. Missing key returns default, not
 raw key.
 
-**Reference:** `systems/localisation.md`
+**Reference:** `.private/systems/localisation.md`
 
 ---
 
@@ -1396,7 +1396,7 @@ two-column layout mirrors correctly in RTL.
 **Definition of done:** LTR layout correct. RTL layout mirrors
 correctly. No hardcoded `left`/`right` in any first-party component.
 
-**Reference:** `systems/localisation.md`
+**Reference:** `.private/systems/localisation.md`
 
 ---
 
@@ -1411,7 +1411,7 @@ rendered where CBDT/COLRv1 supported, monochrome otherwise.
 string renders without tofu. Emoji codepoint renders. Skin with
 Latin-only font falls back to Noto for Cyrillic.
 
-**Reference:** `systems/localisation.md`
+**Reference:** `.private/systems/localisation.md`
 
 ---
 
@@ -1441,7 +1441,7 @@ require UIExtensions installed when OHUI is present.
 - Works without UIExtensions installed
 - Works alongside UIExtensions (shim takes priority for covered calls)
 
-**Reference:** `compatibility.md` § UIExtensions
+**Reference:** `.private/compatibility.md` § UIExtensions
 
 ---
 
@@ -1461,7 +1461,7 @@ to calling mod where determinable. Always on — not disableable.
 - Message typed correctly as `notification`
 - Message persists in log after on-screen display fades
 
-**Reference:** `compatibility.md` § Native Notification System
+**Reference:** `.private/compatibility.md` § Native Notification System
 
 ---
 
@@ -1491,7 +1491,7 @@ HUD status indicators. Graceful fallback when absent.
 - Any absent: corresponding panel/indicator absent, no error.
 - Log shows detection result for each on startup.
 
-**Reference:** `compatibility.md` § Frozen Giants
+**Reference:** `.private/compatibility.md` § Frozen Giants
 
 ---
 
@@ -1512,7 +1512,7 @@ as data sources. Graceful fallback when absent.
 - Neither installed: NPC tracking shows only vanilla followers
 - Log shows detection result on startup
 
-**Reference:** `compatibility.md` § Frozen Giants
+**Reference:** `.private/compatibility.md` § Frozen Giants
 
 ---
 
@@ -1531,7 +1531,7 @@ map markers, custom skill trees, quest journal, and tween menu.
 - LOTD screens available as tween menu destinations
 - LOTD absent: all above absent, no error
 
-**Reference:** `compatibility.md` § Frozen Giants
+**Reference:** `.private/compatibility.md` § Frozen Giants
 
 ---
 
@@ -1547,7 +1547,7 @@ and General Stores (barter/economy data).
 - General Stores installed: merchant data available in barter screen
 - Either absent: corresponding feature absent, no error
 
-**Reference:** `compatibility.md` § Frozen Giants
+**Reference:** `.private/compatibility.md` § Frozen Giants
 
 ---
 
@@ -1582,7 +1582,7 @@ integration. Outfits persisted in cosave Outfit Definitions block.
 - Save game, reload — outfits restored from cosave
 - Label field accepts freeform text, retrievable via API
 
-**Reference:** `systems/outfit-system.md`
+**Reference:** `.private/systems/outfit-system.md`
 
 ---
 
@@ -1607,7 +1607,7 @@ Per-follower outfit data persisted in cosave.
 - Multiple followers maintain independent outfit lists
 - Save game, reload — follower outfits restored from cosave
 
-**Reference:** `systems/outfit-system.md` § Follower Outfits
+**Reference:** `.private/systems/outfit-system.md` § Follower Outfits
 
 ---
 
@@ -1627,8 +1627,8 @@ it directly from the radial without opening inventory.
 - Activate slot — outfit equipped
 - Outfit deleted — radial slot shows empty/missing state
 
-**Reference:** `systems/outfit-system.md` § HUD Widget Integration,
-`screens/favourites-radial.md`
+**Reference:** `.private/systems/outfit-system.md` § HUD Widget Integration,
+`.private/screens/favourites-radial.md`
 
 ---
 
@@ -1951,7 +1951,7 @@ design, or depend on prior phases being proven.
 - **Map live location preview** — post-1.0 exploratory.
 - **Outfit-to-UI theme pairing** — manual colour theme selection
   per outfit. Post-1.0, data model slot included from day one.
-- **New Game+** — parked in `systems/new-game-plus.md`. Not in 1.0
+- **New Game+** — parked in `.private/systems/new-game-plus.md`. Not in 1.0
   scope. Depends on further design discussion (heirloom items,
   faction standing feasibility, companion plugin scope).
 
@@ -1961,5 +1961,5 @@ The following were previously in scope and have been removed from
 the design entirely:
 
 - **Provenance stamps** — item crafting history, dedications,
-  sentimental protection. Cut. See `systems/provenance-stamps.md`
+  sentimental protection. Cut. See `.private/systems/provenance-stamps.md`
   for status note.
