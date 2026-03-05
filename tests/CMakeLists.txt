@@ -34,6 +34,8 @@ set(TEST_SOURCES
     ComponentRegistryTests.cpp
     TokenSetTests.cpp
     IconAtlasTests.cpp
+    TextComponentTests.cpp
+    ValueComponentTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

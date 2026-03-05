@@ -1,5 +1,7 @@
 #include "BuiltinHandlers.h"
 #include "AtomHandlers.h"
+#include "TextHandlers.h"
+#include "ValueHandlers.h"
 
 #include <algorithm>
 #include <cmath>
@@ -17,6 +19,14 @@ void ComponentRegistry::RegisterBuiltins() {
     Register("Line", std::make_unique<LineHandler>());
     Register("Divider", std::make_unique<DividerHandler>());
     Register("Viewport", std::make_unique<ViewportPlaceholderHandler>());
+    Register("Caption", std::make_unique<CaptionHandler>());
+    Register("RichText", std::make_unique<RichTextHandler>());
+    Register("LoreText", std::make_unique<LoreTextHandler>());
+    Register("StatValue", std::make_unique<StatValueHandler>());
+    Register("StatDelta", std::make_unique<StatDeltaHandler>());
+    Register("DeltaList", std::make_unique<DeltaListHandler>());
+    Register("TimerBar", std::make_unique<TimerBarHandler>());
+    Register("CountBadge", std::make_unique<CountBadgeHandler>());
 }
 
 // --- PanelHandler ---

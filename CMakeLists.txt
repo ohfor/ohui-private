@@ -108,6 +108,8 @@ set(CORE_SOURCES
     src/dsl/handlers/BuiltinHandlers.cpp
     src/dsl/handlers/AtomHandlers.cpp
     src/dsl/IconAtlas.cpp
+    src/dsl/handlers/TextHandlers.cpp
+    src/dsl/handlers/ValueHandlers.cpp
     # Each task appends here
 )
 
