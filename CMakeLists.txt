@@ -102,6 +102,7 @@ set(CORE_SOURCES
     src/mcm/MCM2HotReloadEngine.cpp
     src/i18n/StringTable.cpp
     src/widget/ModWidgetAPI.cpp
+    src/binding/ModBindingAPI.cpp
     # Each task appends here
 )
 
@@ -159,6 +160,7 @@ set(CORE_HEADERS
     include/ohui/i18n/StringTable.h
     include/ohui/core/RegistrationTypes.h
     include/ohui/widget/ModWidgetAPI.h
+    include/ohui/binding/ModBindingAPI.h
     # Each task appends here
 )
 

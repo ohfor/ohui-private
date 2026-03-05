@@ -35,6 +35,19 @@ Result<void> DataBindingEngine::RegisterBinding(const BindingDefinition& def, Po
     return {};
 }
 
+Result<void> DataBindingEngine::UnregisterBinding(std::string_view bindingId) {
+    auto it = m_bindings.find(std::string(bindingId));
+    if (it == m_bindings.end()) {
+        return std::unexpected(Error{ErrorCode::BindingNotFound,
+            "Binding not found: " + std::string(bindingId)});
+    }
+    auto subIt = std::remove_if(m_subscriptions.begin(), m_subscriptions.end(),
+        [&](const Subscription& s) { return s.bindingId == bindingId; });
+    m_subscriptions.erase(subIt, m_subscriptions.end());
+    m_bindings.erase(it);
+    return {};
+}
+
 bool DataBindingEngine::HasBinding(std::string_view bindingId) const {
     return m_bindings.contains(std::string(bindingId));
 }

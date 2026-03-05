@@ -29,6 +29,7 @@ set(TEST_SOURCES
     StringTableTests.cpp
     RTLLayoutTests.cpp
     ModWidgetAPITests.cpp
+    ModBindingAPITests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

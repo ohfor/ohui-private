@@ -13,6 +13,7 @@ namespace ohui::binding {
 class DataBindingEngine {
 public:
     Result<void> RegisterBinding(const BindingDefinition& def, PollFunction pollFn);
+    Result<void> UnregisterBinding(std::string_view bindingId);
     bool HasBinding(std::string_view bindingId) const;
     const BindingDefinition* GetBindingDefinition(std::string_view bindingId) const;
     std::vector<std::string> GetAllBindingIds() const;
