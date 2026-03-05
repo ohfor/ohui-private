@@ -23,6 +23,7 @@ set(TEST_SOURCES
     MCMListManagerTests.cpp
     MCM2ParserTests.cpp
     MCM2ConditionTests.cpp
+    MCM2PersistenceTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})
