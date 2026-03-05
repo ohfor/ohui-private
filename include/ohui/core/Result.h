@@ -18,6 +18,7 @@ enum class ErrorCode {
     BindingNotFound,
     InvalidBinding,
     ProfileNotFound,
+    EditModeNotActive,
 };
 
 struct Error {

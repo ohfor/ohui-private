@@ -10,6 +10,7 @@ set(TEST_SOURCES
     WidgetRegistryTests.cpp
     DataBindingTests.cpp
     LayoutProfileTests.cpp
+    EditModeTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

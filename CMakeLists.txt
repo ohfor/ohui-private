@@ -80,6 +80,10 @@ set(CORE_SOURCES
     src/widget/WidgetRegistry.cpp
     src/binding/DataBindingEngine.cpp
     src/widget/LayoutProfileManager.cpp
+    src/widget/UndoRedoStack.cpp
+    src/widget/EditCommands.cpp
+    src/widget/MultiSelectState.cpp
+    src/widget/EditSession.cpp
     # Each task appends here
 )
 
@@ -103,6 +107,12 @@ set(CORE_HEADERS
     include/ohui/binding/DataBindingEngine.h
     include/ohui/widget/LayoutProfile.h
     include/ohui/widget/LayoutProfileManager.h
+    include/ohui/widget/EditTypes.h
+    include/ohui/widget/UndoRedoStack.h
+    include/ohui/widget/EditCommands.h
+    include/ohui/widget/SnapGrid.h
+    include/ohui/widget/MultiSelectState.h
+    include/ohui/widget/EditSession.h
     # Each task appends here
 )
 
