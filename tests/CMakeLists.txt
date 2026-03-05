@@ -26,6 +26,7 @@ set(TEST_SOURCES
     MCM2PersistenceTests.cpp
     MCM2DiffTests.cpp
     MCM2HotReloadTests.cpp
+    StringTableTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

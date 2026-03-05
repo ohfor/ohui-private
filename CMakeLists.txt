@@ -100,6 +100,7 @@ set(CORE_SOURCES
     src/mcm/MCM2PersistenceManager.cpp
     src/mcm/MCM2DefinitionDiff.cpp
     src/mcm/MCM2HotReloadEngine.cpp
+    src/i18n/StringTable.cpp
     # Each task appends here
 )
 
@@ -153,6 +154,8 @@ set(CORE_HEADERS
     include/ohui/mcm/MCM2PersistenceManager.h
     include/ohui/mcm/MCM2DefinitionDiff.h
     include/ohui/mcm/MCM2HotReloadEngine.h
+    include/ohui/i18n/StringTypes.h
+    include/ohui/i18n/StringTable.h
     # Each task appends here
 )
 
