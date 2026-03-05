@@ -118,6 +118,7 @@ set(CORE_SOURCES
     src/dsl/handlers/ListHandlers.cpp
     src/dsl/handlers/EditModeHandlers.cpp
     src/dsl/handlers/HUDHandlers.cpp
+    src/hud/HUDWidgetManager.cpp
     # Each task appends here
 )
 
@@ -182,6 +183,9 @@ set(CORE_HEADERS
     include/ohui/dsl/DefaultTokens.h
     include/ohui/dsl/IconAtlas.h
     include/ohui/dsl/ComponentStateStore.h
+    include/ohui/hud/HUDWidgetDefs.h
+    include/ohui/hud/HUDWidgetManifests.h
+    include/ohui/hud/HUDWidgetManager.h
     # Each task appends here
 )
 
