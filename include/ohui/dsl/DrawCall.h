@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -16,7 +17,7 @@ struct Color {
 };
 
 enum class TextAlign { Left, Center, Right };
-enum class DrawCallType { Rect, Text, Icon, Image };
+enum class DrawCallType { Rect, Text, Icon, Image, Line };
 
 struct DrawRect {
     float x{}, y{}, width{}, height{};
@@ -51,10 +52,22 @@ struct DrawImage {
     float sliceLeft{0}, sliceTop{0}, sliceRight{0}, sliceBottom{0};
 };
 
+struct DrawLine {
+    float x1{}, y1{}, x2{}, y2{};
+    Color color;
+    float thickness{1.0f};
+    float opacity{1.0f};
+};
+
+struct ClipRect {
+    float x{}, y{}, width{}, height{};
+};
+
 struct DrawCall {
     DrawCallType type;
-    std::variant<DrawRect, DrawText, DrawIcon, DrawImage> data;
+    std::variant<DrawRect, DrawText, DrawIcon, DrawImage, DrawLine> data;
     int32_t zIndex{0};
+    std::optional<ClipRect> clip;
 };
 
 struct DrawCallList {

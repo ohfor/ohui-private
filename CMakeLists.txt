@@ -106,6 +106,8 @@ set(CORE_SOURCES
     src/message/MessageStream.cpp
     src/dsl/ComponentRegistry.cpp
     src/dsl/handlers/BuiltinHandlers.cpp
+    src/dsl/handlers/AtomHandlers.cpp
+    src/dsl/IconAtlas.cpp
     # Each task appends here
 )
 
@@ -167,6 +169,8 @@ set(CORE_HEADERS
     include/ohui/message/MessageTypes.h
     include/ohui/message/MessageStream.h
     include/ohui/dsl/ComponentHandler.h
+    include/ohui/dsl/DefaultTokens.h
+    include/ohui/dsl/IconAtlas.h
     # Each task appends here
 )
 

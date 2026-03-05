@@ -1,4 +1,5 @@
 #include "BuiltinHandlers.h"
+#include "AtomHandlers.h"
 
 #include <algorithm>
 #include <cmath>
@@ -13,6 +14,9 @@ void ComponentRegistry::RegisterBuiltins() {
     Register("ValueBar", std::make_unique<ValueBarHandler>());
     Register("Icon", std::make_unique<IconHandler>());
     Register("Image", std::make_unique<ImageHandler>());
+    Register("Line", std::make_unique<LineHandler>());
+    Register("Divider", std::make_unique<DividerHandler>());
+    Register("Viewport", std::make_unique<ViewportPlaceholderHandler>());
 }
 
 // --- PanelHandler ---

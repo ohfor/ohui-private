@@ -67,9 +67,10 @@ static const DrawImage* FindDrawImage(const DrawCallList& list, size_t index = 0
     return nullptr;
 }
 
-TEST_CASE("RegisterBuiltins registers 5 handlers", "[component-registry]") {
+TEST_CASE("RegisterBuiltins registers all builtin handlers", "[component-registry]") {
     auto registry = MakeRegistry();
-    CHECK(registry.Count() == 5);
+    // 5 original (Panel, Label, ValueBar, Icon, Image) + 3 atoms (Line, Divider, Viewport)
+    CHECK(registry.Count() == 8);
 }
 
 TEST_CASE("Get returns correct handler for Panel", "[component-registry]") {
