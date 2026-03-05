@@ -9,6 +9,7 @@
         "catch2",
         "rapidcsv",
         "spdlog",
-        "xbyak"
+        "xbyak",
+        "yoga"
     ]
 }

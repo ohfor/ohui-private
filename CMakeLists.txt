@@ -34,8 +34,9 @@ if(MSVC)
 endif()
 
 # ---- Dependencies ----
-# spdlog and xbyak come from vcpkg
+# spdlog, xbyak, yoga come from vcpkg
 find_package(spdlog CONFIG REQUIRED)
+find_package(yoga CONFIG REQUIRED)
 
 # CommonLibSSE-NG via FetchContent (SE/AE/VR in single DLL)
 include(FetchContent)
@@ -102,7 +103,7 @@ target_precompile_headers(ohui_core PRIVATE include/CorePCH.h)
 
 target_link_libraries(ohui_core
     PUBLIC spdlog::spdlog
-    PRIVATE ohui_compile_options
+    PRIVATE ohui_compile_options yoga::yogacore
 )
 
 target_compile_features(ohui_core PRIVATE cxx_std_23)
