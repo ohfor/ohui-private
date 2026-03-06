@@ -32,6 +32,8 @@ struct TestHarness {
     float enemyHealthPct{0.8f};
     int64_t enemyLevel{50};
     float breathPct{0.8f};
+    bool sneaking{false};
+    bool hasTarget{false};
 
     TestHarness()
         : registry(MakeRegistry()),
@@ -53,6 +55,8 @@ struct TestHarness {
         (void)bindings.RegisterBinding({"enemy.health.pct", BindingType::Float, ""}, [&]() -> BindingValue { return enemyHealthPct; });
         (void)bindings.RegisterBinding({"enemy.level", BindingType::Int, ""}, [&]() -> BindingValue { return enemyLevel; });
         (void)bindings.RegisterBinding({"player.breath.pct", BindingType::Float, ""}, [&]() -> BindingValue { return breathPct; });
+        (void)bindings.RegisterBinding({"player.sneaking", BindingType::Bool, ""}, [&]() -> BindingValue { return sneaking; });
+        (void)bindings.RegisterBinding({"player.has.target", BindingType::Bool, ""}, [&]() -> BindingValue { return hasTarget; });
 
         // Subscribe to trigger polling
         for (const auto& id : bindings.GetAllBindingIds()) {
@@ -554,4 +558,206 @@ TEST_CASE("WidgetCount returns 9", "[hud-widget]") {
     TestHarness h;
     REQUIRE(h.manager.LoadDefaults().has_value());
     CHECK(h.manager.WidgetCount() == 9);
+}
+
+// ===========================================================================
+// Visibility / Lifecycle
+// ===========================================================================
+
+TEST_CASE("Always-visible widgets start visible after LoadDefaults", "[hud-visibility]") {
+    TestHarness h;
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_health")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_stamina")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_magicka")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_compass")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_notifications")->visible);
+}
+
+TEST_CASE("Conditional widgets start hidden after LoadDefaults", "[hud-visibility]") {
+    TestHarness h;
+    h.shoutCooldownPct = 0.0f;
+    h.sneaking = false;
+    h.hasTarget = false;
+    h.breathPct = 1.0f;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_shout")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_enemy")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+}
+
+TEST_CASE("Breath visible when player.breath.pct < 1.0", "[hud-visibility]") {
+    TestHarness h;
+    h.breathPct = 0.5f;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+}
+
+TEST_CASE("Breath hidden when player.breath.pct == 1.0", "[hud-visibility]") {
+    TestHarness h;
+    h.breathPct = 1.0f;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+}
+
+TEST_CASE("Detection visible when player.sneaking == true", "[hud-visibility]") {
+    TestHarness h;
+    h.sneaking = true;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+}
+
+TEST_CASE("Detection hidden when player.sneaking == false", "[hud-visibility]") {
+    TestHarness h;
+    h.sneaking = false;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+}
+
+TEST_CASE("Enemy visible when player.has.target == true", "[hud-visibility]") {
+    TestHarness h;
+    h.hasTarget = true;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_enemy")->visible);
+}
+
+TEST_CASE("Enemy hidden when player.has.target == false", "[hud-visibility]") {
+    TestHarness h;
+    h.hasTarget = false;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_enemy")->visible);
+}
+
+TEST_CASE("Shout visible when player.shout.cooldown.pct > 0.0", "[hud-visibility]") {
+    TestHarness h;
+    h.shoutCooldownPct = 0.3f;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_shout")->visible);
+}
+
+TEST_CASE("Shout hidden when player.shout.cooldown.pct == 0.0", "[hud-visibility]") {
+    TestHarness h;
+    h.shoutCooldownPct = 0.0f;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_shout")->visible);
+}
+
+TEST_CASE("Breath toggle cycle: visible -> hidden -> visible", "[hud-visibility]") {
+    TestHarness h;
+    h.breathPct = 0.5f;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    // Should become visible
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+
+    // Full breath -> hidden
+    h.breathPct = 1.0f;
+    h.UpdateBindings();
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+
+    // Low breath -> visible again
+    h.breathPct = 0.3f;
+    h.UpdateBindings();
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+}
+
+TEST_CASE("UpdateVisibility is idempotent", "[hud-visibility]") {
+    TestHarness h;
+    h.sneaking = true;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+
+    // Call again with same state - no error, same result
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+}
+
+TEST_CASE("Active flag syncs with visible", "[hud-visibility]") {
+    TestHarness h;
+    h.sneaking = false;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    // Initially hidden and inactive
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->active);
+
+    // Show -> active
+    h.sneaking = true;
+    h.UpdateBindings();
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->active);
+
+    // Hide -> inactive
+    h.sneaking = false;
+    h.UpdateBindings();
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->active);
+}
+
+TEST_CASE("Multiple widgets change state in single UpdateVisibility", "[hud-visibility]") {
+    TestHarness h;
+    h.sneaking = false;
+    h.hasTarget = false;
+    h.breathPct = 1.0f;
+    h.shoutCooldownPct = 0.0f;
+    h.UpdateBindings();
+    REQUIRE(h.manager.LoadDefaults().has_value());
+
+    // All conditional widgets hidden
+    h.manager.UpdateVisibility();
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_enemy")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+    CHECK_FALSE(h.widgetRegistry.GetWidgetState("ohui_hud_shout")->visible);
+
+    // Flip all to visible conditions
+    h.sneaking = true;
+    h.hasTarget = true;
+    h.breathPct = 0.5f;
+    h.shoutCooldownPct = 0.7f;
+    h.UpdateBindings();
+    h.manager.UpdateVisibility();
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_detection")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_enemy")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_breath")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_shout")->visible);
 }

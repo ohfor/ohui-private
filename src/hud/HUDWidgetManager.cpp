@@ -15,15 +15,31 @@ HUDWidgetManager::HUDWidgetManager(dsl::DSLRuntimeEngine& dslEngine,
 
 const std::vector<HUDWidgetManager::HUDEntry>& HUDWidgetManager::GetDefaultEntries() {
     static const std::vector<HUDEntry> entries = {
-        {"ohui_hud_health",        kHealthBarDef,        kHealthManifest},
-        {"ohui_hud_stamina",       kStaminaBarDef,       kStaminaManifest},
-        {"ohui_hud_magicka",       kMagickaBarDef,       kMagickaManifest},
-        {"ohui_hud_compass",       kCompassDef,          kCompassManifest},
-        {"ohui_hud_shout",         kShoutCooldownDef,    kShoutManifest},
-        {"ohui_hud_detection",     kDetectionDef,        kDetectionManifest},
-        {"ohui_hud_enemy",         kEnemyHealthDef,      kEnemyManifest},
-        {"ohui_hud_breath",        kBreathMeterDef,      kBreathManifest},
-        {"ohui_hud_notifications", kNotificationToastDef, kNotificationManifest},
+        {"ohui_hud_health",        kHealthBarDef,        kHealthManifest,    {}},
+        {"ohui_hud_stamina",       kStaminaBarDef,       kStaminaManifest,   {}},
+        {"ohui_hud_magicka",       kMagickaBarDef,       kMagickaManifest,   {}},
+        {"ohui_hud_compass",       kCompassDef,          kCompassManifest,   {}},
+        {"ohui_hud_shout",         kShoutCooldownDef,    kShoutManifest,
+            [](const binding::DataBindingEngine& b) {
+                auto* v = b.GetCurrentValue("player.shout.cooldown.pct");
+                return v && std::get<float>(*v) > 0.0f;
+            }},
+        {"ohui_hud_detection",     kDetectionDef,        kDetectionManifest,
+            [](const binding::DataBindingEngine& b) {
+                auto* v = b.GetCurrentValue("player.sneaking");
+                return v && std::get<bool>(*v);
+            }},
+        {"ohui_hud_enemy",         kEnemyHealthDef,      kEnemyManifest,
+            [](const binding::DataBindingEngine& b) {
+                auto* v = b.GetCurrentValue("player.has.target");
+                return v && std::get<bool>(*v);
+            }},
+        {"ohui_hud_breath",        kBreathMeterDef,      kBreathManifest,
+            [](const binding::DataBindingEngine& b) {
+                auto* v = b.GetCurrentValue("player.breath.pct");
+                return v && std::get<float>(*v) < 1.0f;
+            }},
+        {"ohui_hud_notifications", kNotificationToastDef, kNotificationManifest, {}},
     };
     return entries;
 }
@@ -71,9 +87,28 @@ Result<void> HUDWidgetManager::LoadDefaults() {
         }
 
         m_loadedIds.push_back(entry.id);
+
+        if (entry.predicate) {
+            m_predicates[entry.id] = entry.predicate;
+        }
     }
 
     return {};
+}
+
+void HUDWidgetManager::UpdateVisibility() {
+    for (const auto& [id, predicate] : m_predicates) {
+        bool shouldShow = predicate(m_bindings);
+        const auto* state = m_widgetRegistry.GetWidgetState(id);
+        if (!state) continue;
+        if (shouldShow != state->visible) {
+            (void)m_widgetRegistry.SetVisible(id, shouldShow);
+            if (shouldShow)
+                (void)m_widgetRegistry.Activate(id);
+            else
+                (void)m_widgetRegistry.Deactivate(id);
+        }
+    }
 }
 
 Result<dsl::DrawCallList> HUDWidgetManager::Evaluate(std::string_view widgetId,
