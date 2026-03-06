@@ -32,4 +32,8 @@ inline const widget::WidgetManifest kNotificationManifest{
     "ohui_hud_notifications", "Notifications", {880.0f, 100.0f}, {300.0f, 40.0f},
     {200.0f, 30.0f}, {500.0f, 60.0f}, true};
 
+inline const widget::WidgetManifest kMessageFeedManifest{
+    "ohui_hud_messages", "Messages", {10.0f, 500.0f}, {350.0f, 130.0f},
+    {200.0f, 60.0f}, {500.0f, 300.0f}, true};
+
 }  // namespace ohui::hud

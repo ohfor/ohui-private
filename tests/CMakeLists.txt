@@ -45,6 +45,8 @@ set(TEST_SOURCES
     EditModeComponentTests.cpp
     HUDComponentTests.cpp
     HUDWidgetManagerTests.cpp
+    MessageFeedComponentTests.cpp
+    MessageLogPanelTests.cpp
 )
 
 add_executable(ohui_tests ${TEST_SOURCES})

@@ -40,6 +40,7 @@ const std::vector<HUDWidgetManager::HUDEntry>& HUDWidgetManager::GetDefaultEntri
                 return v && std::get<float>(*v) < 1.0f;
             }},
         {"ohui_hud_notifications", kNotificationToastDef, kNotificationManifest, {}},
+        {"ohui_hud_messages",      kMessageFeedDef,       kMessageFeedManifest,  {}},
     };
     return entries;
 }

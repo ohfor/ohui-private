@@ -40,4 +40,7 @@ public:
     void Emit(const ComponentContext& ctx, DrawCallList& output) override;
 };
 
+// --- MessageFeed: stacked message list with per-message fade ---
+// (defined in MessageFeedHandler.h, registered in BuiltinHandlers.cpp)
+
 }  // namespace ohui::dsl

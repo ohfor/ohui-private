@@ -119,6 +119,8 @@ set(CORE_SOURCES
     src/dsl/handlers/EditModeHandlers.cpp
     src/dsl/handlers/HUDHandlers.cpp
     src/hud/HUDWidgetManager.cpp
+    src/dsl/handlers/MessageFeedHandler.cpp
+    src/message/MessageLogPanel.cpp
     # Each task appends here
 )
 
@@ -186,6 +188,7 @@ set(CORE_HEADERS
     include/ohui/hud/HUDWidgetDefs.h
     include/ohui/hud/HUDWidgetManifests.h
     include/ohui/hud/HUDWidgetManager.h
+    include/ohui/message/MessageLogPanel.h
     # Each task appends here
 )
 

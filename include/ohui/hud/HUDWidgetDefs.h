@@ -118,4 +118,19 @@ inline constexpr std::string_view kNotificationToastDef = R"(
     }
 )";
 
+inline constexpr std::string_view kMessageFeedDef = R"(
+    widget ohui_hud_messages {
+        MessageFeed {
+            maxVisible: 5;
+            fadeInDuration: 0.3;
+            fadeOutDuration: 0.5;
+            defaultLifetime: 5.0;
+            currentTime: bind(hud.realtime);
+            itemHeight: 24;
+            width: 350;
+            height: 130;
+        }
+    }
+)";
+
 }  // namespace ohui::hud

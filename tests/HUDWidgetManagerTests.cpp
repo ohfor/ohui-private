@@ -34,6 +34,7 @@ struct TestHarness {
     float breathPct{0.8f};
     bool sneaking{false};
     bool hasTarget{false};
+    float hudRealtime{0.0f};
 
     TestHarness()
         : registry(MakeRegistry()),
@@ -57,6 +58,7 @@ struct TestHarness {
         (void)bindings.RegisterBinding({"player.breath.pct", BindingType::Float, ""}, [&]() -> BindingValue { return breathPct; });
         (void)bindings.RegisterBinding({"player.sneaking", BindingType::Bool, ""}, [&]() -> BindingValue { return sneaking; });
         (void)bindings.RegisterBinding({"player.has.target", BindingType::Bool, ""}, [&]() -> BindingValue { return hasTarget; });
+        (void)bindings.RegisterBinding({"hud.realtime", BindingType::Float, ""}, [&]() -> BindingValue { return hudRealtime; });
 
         // Subscribe to trigger polling
         for (const auto& id : bindings.GetAllBindingIds()) {
@@ -112,13 +114,13 @@ static size_t CountDrawLines(const DrawCallList& list) {
 // LoadDefaults
 // ===========================================================================
 
-TEST_CASE("LoadDefaults registers all 9 manifests in WidgetRegistry", "[hud-widget]") {
+TEST_CASE("LoadDefaults registers all 10 manifests in WidgetRegistry", "[hud-widget]") {
     TestHarness h;
     REQUIRE(h.manager.LoadDefaults().has_value());
-    CHECK(h.widgetRegistry.WidgetCount() == 9);
+    CHECK(h.widgetRegistry.WidgetCount() == 10);
 }
 
-TEST_CASE("LoadDefaults loads all 9 widget defs in DSLRuntimeEngine", "[hud-widget]") {
+TEST_CASE("LoadDefaults loads all 10 widget defs in DSLRuntimeEngine", "[hud-widget]") {
     TestHarness h;
     REQUIRE(h.manager.LoadDefaults().has_value());
     CHECK(h.dslEngine.HasWidget("ohui_hud_health"));
@@ -130,13 +132,14 @@ TEST_CASE("LoadDefaults loads all 9 widget defs in DSLRuntimeEngine", "[hud-widg
     CHECK(h.dslEngine.HasWidget("ohui_hud_enemy"));
     CHECK(h.dslEngine.HasWidget("ohui_hud_breath"));
     CHECK(h.dslEngine.HasWidget("ohui_hud_notifications"));
+    CHECK(h.dslEngine.HasWidget("ohui_hud_messages"));
 }
 
 TEST_CASE("LoadDefaults called twice does not crash or duplicate", "[hud-widget]") {
     TestHarness h;
     REQUIRE(h.manager.LoadDefaults().has_value());
     REQUIRE(h.manager.LoadDefaults().has_value());
-    CHECK(h.manager.WidgetCount() == 9);
+    CHECK(h.manager.WidgetCount() == 10);
 }
 
 // ===========================================================================
@@ -546,18 +549,18 @@ TEST_CASE("100% breath shows full fill", "[hud-widget]") {
 // Integration
 // ===========================================================================
 
-TEST_CASE("GetWidgetIds returns all 9 IDs", "[hud-widget]") {
+TEST_CASE("GetWidgetIds returns all 10 IDs", "[hud-widget]") {
     TestHarness h;
     REQUIRE(h.manager.LoadDefaults().has_value());
 
     auto ids = h.manager.GetWidgetIds();
-    CHECK(ids.size() == 9);
+    CHECK(ids.size() == 10);
 }
 
-TEST_CASE("WidgetCount returns 9", "[hud-widget]") {
+TEST_CASE("WidgetCount returns 10", "[hud-widget]") {
     TestHarness h;
     REQUIRE(h.manager.LoadDefaults().has_value());
-    CHECK(h.manager.WidgetCount() == 9);
+    CHECK(h.manager.WidgetCount() == 10);
 }
 
 // ===========================================================================
@@ -573,6 +576,7 @@ TEST_CASE("Always-visible widgets start visible after LoadDefaults", "[hud-visib
     CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_magicka")->visible);
     CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_compass")->visible);
     CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_notifications")->visible);
+    CHECK(h.widgetRegistry.GetWidgetState("ohui_hud_messages")->visible);
 }
 
 TEST_CASE("Conditional widgets start hidden after LoadDefaults", "[hud-visibility]") {

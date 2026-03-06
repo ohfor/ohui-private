@@ -10,6 +10,7 @@
 #include "ListHandlers.h"
 #include "EditModeHandlers.h"
 #include "HUDHandlers.h"
+#include "MessageFeedHandler.h"
 
 #include <algorithm>
 #include <cmath>
@@ -72,6 +73,7 @@ void ComponentRegistry::RegisterBuiltins() {
     Register("DetectionMeter", std::make_unique<DetectionMeterHandler>());
     Register("StealthEye", std::make_unique<StealthEyeHandler>());
     Register("NotificationToast", std::make_unique<NotificationToastHandler>());
+    Register("MessageFeed", std::make_unique<MessageFeedHandler>());
 }
 
 // --- PanelHandler ---
