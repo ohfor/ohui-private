@@ -16,6 +16,10 @@ A separate public repository receives a **filtered subset** of this repo (source
 
 **OHUI** — A complete UI framework for Skyrim SE/AE/VR. Not a SkyUI reskin — a full replacement of the infrastructure, with backwards compatibility for SkyUI-dependent mods on day one.
 
+## Pending Renames
+
+**`MCM2` is a placeholder name.** All types, files, classes, test tags, and references using `MCM2` (e.g., `MCM2DefinitionParser`, `MCM2Types.h`, `[mcm2-parser]`) will be renamed before public release. The final user-facing name for OHUI's native mod configuration system has not been decided yet. Do not use "MCM2" in any user-facing text, documentation destined for `docs/`, or Nexus-facing content. Internal code and `.private/` documents may continue using `MCM2` until the rename pass.
+
 ## Build
 
 > Full setup guide: `docs/Build.md`
